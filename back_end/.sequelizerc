@@ -1,0 +1,9 @@
+const path = require('path');
+
+module.exports = {
+    config: path.resolve(__dirname, "src", "config", "db", "database.js"), // Mostrando a localizacao dos dados do bd
+    "migrations-path": path.resolve(__dirname, "src", "config", "db", "migrations"), // Mostrando o caminho das migrations
+    // Para se criar uma migration: yarn sequelize-cli migration:create --name=oq_a_migration_faz
+    // Depois yarn sequelize-cli db:migrate
+}   
+
