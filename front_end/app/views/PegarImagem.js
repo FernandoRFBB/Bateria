@@ -53,7 +53,10 @@ export default function PegarImagem({ navigation, route }) {
         {image &&
           <View>
             <Image source={{ uri: image }} style={styles.avatar}/>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("UsuarioForm", { uri: image })}>
+            <TouchableOpacity style={styles.button}
+              onPress={() => navigation.navigate("UsuarioForm",
+                { uri: image, instrumento: route.params.instrumento, tela: route.params.tela })}
+            >
               <Text style={styles.buttonText}>Enviar</Text>
             </TouchableOpacity>
           </View>

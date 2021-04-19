@@ -13,7 +13,6 @@ export default function Input(props) {
                 style={styles.boxInput}
                 {...props}
             />
-            
         </View>
     )
 }
