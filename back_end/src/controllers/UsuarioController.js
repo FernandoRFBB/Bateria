@@ -1,3 +1,5 @@
+const { QueryTypes, TableHints } = require('sequelize');
+const { sequelize } = require('../models/Usuario');
 const Usuario = require('../models/Usuario');
 
 const create = async (req, res) => {
@@ -108,11 +110,28 @@ const deleteOne = async (req, res) => {
     }
 }
 
+const tam_camisa = async (req, res) => {
+    try {
+        // Metodo de consulta por query
+        // const result = await sequelize.query(
+        //     "SELECT tam_camisa, COUNT(id) FROM usuarios GROUP BY tam_camisa"
+        //     , { type: QueryTypes.SELECT });
+        const result = await Usuario.findAll({
+            attributes: ['tam_camisa', [sequelize.fn('count', sequelize.col('id')), 'qtd']],
+            group: ['tam_camisa'],
+        })
+        return res.json({ result })
+    } catch (error) {
+        return res.json({error: error.message});
+    }
+}
+
 module.exports = {
     create,
     list,
     listOne,
     update,
     deleteOne,
+    tam_camisa,
 }
 
