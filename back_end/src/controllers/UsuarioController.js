@@ -1,16 +1,14 @@
-const { QueryTypes, TableHints } = require('sequelize');
+const { Op } = require('sequelize');
 const { sequelize } = require('../models/Usuario');
 const Usuario = require('../models/Usuario');
 
 const create = async (req, res) => {
     try {
+        const { escola_id } = req.params;
         const { nome, cpf, telefone,
                 tam_camisa, tam_calca,
                 tam_calcado, diretor,
-                escola_id, instrumento_id,
-                foto } = req.body;
-        
-        // Preciso criar um codigo para ver se existe escola e instruemnto?
+                instrumento_id, foto } = req.body;
 
         const usuario = await Usuario.create({
             nome,
@@ -36,11 +34,17 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
     try {
-        const usuario = await Usuario.findAll();
-        return res.json({
-            usuario,
+        const { escola_id } = req.params;
+        const usuario = await Usuario.findAll({
+            where: { escola_id: escola_id }
         });
-
+        if (usuario != 0) {
+            return res.json({
+                usuario,
+            });
+        }
+        
+        throw new Error("Escola não encontrada");
     } catch (error) {
         return res.json({error: error.message});
     }
@@ -48,12 +52,19 @@ const list = async (req, res) => {
 
 const listOne = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id, escola_id } = req.params;
 
-        const usuario = await Usuario.findByPk(id);
-        return res.json({
-            usuario,
+        const usuario = await Usuario.findAll({
+            where: {[Op.and]: [
+                { id: id }, { escola_id: escola_id }
+            ]}
         });
+        if (usuario != 0) {
+            return res.json({
+                usuario,
+            });
+        }
+        throw new Error("Usuario não encontrado");
     } catch (error) {
         return res.json({error: error.message});
     }
@@ -61,7 +72,7 @@ const listOne = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id, escola_id } = req.params;
         const { nome, cpf,  telefone,
             tam_camisa, tam_calca,
             tam_calcado, diretor,
@@ -78,15 +89,18 @@ const update = async (req, res) => {
             instrumento_id,
             foto
         }, {
-            where: { id: id }
+            where: { [Op.and]: [
+                { id: id }, { escola_id: escola_id }
+            ]}
         });
 
-        if (updated) {
+        if (updated != 0) {
             const usuario = await Usuario.findByPk(id);
             return res.json({
                 usuario
             })
         }
+        throw new Error("Usuario não encontrado")
     } catch (error) {
         return res.json({ error: error.message })
     }
@@ -94,33 +108,50 @@ const update = async (req, res) => {
 
 const deleteOne = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id, escola_id } = req.params;
         const deleted = await Usuario.destroy({
-            where: { id: id }
+            where: { [Op.and]: [
+                { id: id },
+                { escola_id: escola_id }
+            ]}
         });
 
         if (deleted) {
             return res.json({
                 message: "Usuario deletado com sucesso"
             })
-        };
-        throw new Error("Escola não existe");
+        }
+        throw new Error("Usuario não encontrado");
     } catch (error) {
         return res.json({ error: error.message});
     }
 }
 
-const tam_camisa = async (req, res) => {
+const tamanhos = async (req, res) => {
     try {
         // Metodo de consulta por query
         // const result = await sequelize.query(
         //     "SELECT tam_camisa, COUNT(id) FROM usuarios GROUP BY tam_camisa"
         //     , { type: QueryTypes.SELECT });
-        const result = await Usuario.findAll({
-            attributes: ['tam_camisa', [sequelize.fn('count', sequelize.col('id')), 'qtd']],
-            group: ['tam_camisa'],
+        const { escola_id } = req.params;
+        const camisa = await Usuario.findAll({
+            attributes: ["tam_camisa", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
+            where: { escola_id: escola_id },
+            group: ["tam_camisa"],
         })
-        return res.json({ result })
+        const calca = await Usuario.findAll({
+            attributes: ["tam_calca", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
+            where: { escola_id: escola_id },
+            group: ["tam_calca"],
+        })
+        const calcado = await Usuario.findAll({
+            attributes: ["tam_calcado", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
+            where: { escola_id: escola_id },
+            group: ["tam_calcado"],
+        })
+        return res.json({ 
+            camisa, calca, calcado
+        })
     } catch (error) {
         return res.json({error: error.message});
     }
@@ -132,6 +163,6 @@ module.exports = {
     listOne,
     update,
     deleteOne,
-    tam_camisa,
+    tamanhos,
 }
 

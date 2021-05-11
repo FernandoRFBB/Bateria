@@ -16,6 +16,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
     try {
         const instrumento = await Instrumento.findAll();
+        console.log(instrumento)
         return res.json({
             instrumento,
         });

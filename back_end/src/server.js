@@ -7,6 +7,7 @@ require("./config/db/index");
 const routesEscola = require("./routes/routesEscola"); // Importando arquivo de rota
 const routesInstrumento = require("./routes/routesInstrumento");
 const routesUsuario = require("./routes/routesUsuario");
+const routesLimite = require("./routes/routesLimite");
 
 app.use(express.json()); // Para poder usar express com json
 
@@ -15,5 +16,6 @@ app.use(express.json()); // Para poder usar express com json
 app.use("/api/escolas/", routesEscola);
 app.use("/api/instrumentos/", routesInstrumento);
 app.use("/api/usuarios", routesUsuario);
+app.use("/api/limites", routesLimite);
 
 app.listen(3000);

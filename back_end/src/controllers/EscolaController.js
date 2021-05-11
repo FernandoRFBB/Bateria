@@ -1,12 +1,34 @@
+const { sequelize } = require("../models/Escola");
 const Escola = require("../models/Escola");
+const Limite = require("../models/Limite");
+
 
 const create = async (req, res) => {
     try {
         const { nome } = req.body;
 
         const escola = await Escola.create({ nome });
+        const limites = await sequelize.query(
+            "INSERT INTO limites (limite, escola_id, instrumento_id) SELECT 10, ?, id FROM instrumentos",
+            {
+                replacements: [escola.id]
+            }
+        )
+        // var limite = instrumento.map(async (inst) => {
+        //     var temp = await Limite.create({
+        //         escola_id: escola.id,
+        //         instrumento_id: inst.id,
+        //         limite: 10,
+        //     })
+        //     console.log(temp);
+        // })
+        // for (var i = 0; i < instrumento.length; i++) {
+        //     var test = instrumento(i);
+        //     console.log(test.dataValues.id);
+        // }
+
         return res.json({
-            escola,
+            escola, limites
         });
     } catch (error) {
         return res.json({error: error.message});
