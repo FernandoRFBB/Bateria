@@ -1,6 +1,7 @@
 const { sequelize } = require("../models/Escola");
 const Escola = require("../models/Escola");
 const Limite = require("../models/Limite");
+const Usuario = require("../models/Usuario");
 
 
 const create = async (req, res) => {
@@ -9,7 +10,7 @@ const create = async (req, res) => {
 
         const escola = await Escola.create({ nome });
         const limites = await sequelize.query(
-            "INSERT INTO limites (limite, escola_id, instrumento_id) SELECT 10, ?, id FROM instrumentos",
+            "INSERT INTO limites (limite, escola_id, created_at, updated_at, instrumento_id) SELECT 10, ?, GETDATE(), GETDATE(), id FROM instrumentos",
             {
                 replacements: [escola.id]
             }
@@ -80,21 +81,51 @@ const update = async (req, res) => {
     }
 }
 
-const deleteOne = async (req, res) => {
+// const deleteOne = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+
+//         const deleted = await Escola.destroy({
+//             where: { id: id } // Mostrando que da pra fazer assim, porem nao acho tao bom
+//         });
+
+//         if (deleted) {
+//             return res.json({
+//                 message: "Escola deletado com sucesso",
+//             })
+//         }
+//         throw new Error("Escola não existe");
+
+//     } catch (error) {
+//         return res.json({error: error.message});
+//     }
+// }
+
+const tamanhos = async (req, res) => {
     try {
-        const { id } = req.params;
-
-        const deleted = await Escola.destroy({
-            where: { id } // Mostrando que da pra fazer assim, porem nao acho tao bom
-        });
-
-        if (deleted) {
-            return res.json({
-                message: "Escola deletado com sucesso"
-            })
-        }
-        throw new Error("Escola não existe");
-
+        // Metodo de consulta por query
+        // const result = await sequelize.query(
+        //     "SELECT tam_camisa, COUNT(id) FROM usuarios GROUP BY tam_camisa"
+        //     , { type: QueryTypes.SELECT });
+        const { escola_id } = req.params;
+        const camisa = await Usuario.findAll({
+            attributes: ["tam_camisa", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
+            where: { escola_id: escola_id },
+            group: ["tam_camisa"],
+        })
+        const calca = await Usuario.findAll({
+            attributes: ["tam_calca", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
+            where: { escola_id: escola_id },
+            group: ["tam_calca"],
+        })
+        const calcado = await Usuario.findAll({
+            attributes: ["tam_calcado", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
+            where: { escola_id: escola_id },
+            group: ["tam_calcado"],
+        })
+        return res.json({ 
+            camisa, calca, calcado
+        })
     } catch (error) {
         return res.json({error: error.message});
     }
@@ -105,5 +136,6 @@ module.exports = {
     list,
     listOne,
     update,
-    deleteOne
+    // deleteOne,
+    tamanhos,
 }

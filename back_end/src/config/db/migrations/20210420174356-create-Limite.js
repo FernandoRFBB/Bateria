@@ -16,6 +16,7 @@ module.exports = {
           key: "id",
         },
         onUpdate: "CASCADE",
+        onDelete: "CASCADE"
       },
       instrumento_id: {
         type: Sequelize.INTEGER,

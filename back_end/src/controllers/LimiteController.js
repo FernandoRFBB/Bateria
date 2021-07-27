@@ -8,9 +8,9 @@ const list = async (req, res) => {
         // Não sei pq n funciona |const limite = await Limite.findAll();
 
         const limite = await sequelize.query(
-            "SELECT * FROM limites WHERE escola_id = :escola_id;",
+            "SELECT * FROM limites WHERE escola_id = ?",
             {
-                replacements: { escola_id: escola_id }
+                replacements: [escola_id]
             }
         )
         return res.json({

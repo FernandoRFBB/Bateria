@@ -1,22 +1,21 @@
 const Instrumento = require("../models/Instrumento");
 
-const create = async (req, res) => {
-    try {
-        const { nome, foto } = req.body;
+// const create = async (req, res) => {
+//     try {
+//         const { nome, foto } = req.body;
 
-        const instrumento = await Instrumento.create({ nome, foto });
-        return res.json({
-            instrumento,
-        });
-    } catch (error) {
-        return res.json({error: error.message});
-    }
-}
+//         const instrumento = await Instrumento.create({ nome, foto });
+//         return res.json({
+//             instrumento,
+//         });
+//     } catch (error) {
+//         return res.json({error: error.message});
+//     }
+// }
 
 const list = async (req, res) => {
     try {
         const instrumento = await Instrumento.findAll();
-        console.log(instrumento)
         return res.json({
             instrumento,
         });
@@ -59,30 +58,30 @@ const update = async (req, res) => {
     }
 }
 
-const deleteOne = async (req, res) => {
-    try {
-        const { id } = req.params;
+// const deleteOne = async (req, res) => {
+//     try {
+//         const { id } = req.params;
 
-        const deleted = await Instrumento.destroy({
-            where: { id } // Mostrando que da pra fazer assim, porem nao acho tao bom
-        });
+//         const deleted = await Instrumento.destroy({
+//             where: { id } // Mostrando que da pra fazer assim, porem nao acho tao bom
+//         });
 
-        if (deleted) {
-            return res.json({
-                message: "Instrumento deletado com sucesso"
-            })
-        }
-        throw new Error("Instrumento não existe");
+//         if (deleted) {
+//             return res.json({
+//                 message: "Instrumento deletado com sucesso"
+//             })
+//         }
+//         throw new Error("Instrumento não existe");
 
-    } catch (error) {
-        return res.json({error: error.message});
-    }
-}
+//     } catch (error) {
+//         return res.json({error: error.message});
+//     }
+// }
 
 module.exports = {
-    create,
+    // create,
     list,
     listOne,
     update,
-    deleteOne
+    // deleteOne
 }

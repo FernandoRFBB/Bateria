@@ -127,42 +127,11 @@ const deleteOne = async (req, res) => {
     }
 }
 
-const tamanhos = async (req, res) => {
-    try {
-        // Metodo de consulta por query
-        // const result = await sequelize.query(
-        //     "SELECT tam_camisa, COUNT(id) FROM usuarios GROUP BY tam_camisa"
-        //     , { type: QueryTypes.SELECT });
-        const { escola_id } = req.params;
-        const camisa = await Usuario.findAll({
-            attributes: ["tam_camisa", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: escola_id },
-            group: ["tam_camisa"],
-        })
-        const calca = await Usuario.findAll({
-            attributes: ["tam_calca", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: escola_id },
-            group: ["tam_calca"],
-        })
-        const calcado = await Usuario.findAll({
-            attributes: ["tam_calcado", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: escola_id },
-            group: ["tam_calcado"],
-        })
-        return res.json({ 
-            camisa, calca, calcado
-        })
-    } catch (error) {
-        return res.json({error: error.message});
-    }
-}
-
 module.exports = {
     create,
     list,
     listOne,
     update,
     deleteOne,
-    tamanhos,
 }
 

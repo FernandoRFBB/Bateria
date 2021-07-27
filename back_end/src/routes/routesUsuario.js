@@ -4,7 +4,6 @@ const routes = express.Router();
 const UsuarioController = require("../controllers/UsuarioController");
 
 
-routes.get("/:escola_id/tamanhos", UsuarioController.tamanhos);
 routes.get("/:escola_id", UsuarioController.list);
 routes.get("/:escola_id/:id", UsuarioController.listOne);
 routes.put("/:escola_id/:id", UsuarioController.update);
