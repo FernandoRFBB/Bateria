@@ -8,6 +8,6 @@ routes.get("/", EscolaController.list);
 routes.get("/:id", EscolaController.listOne);
 routes.put("/:id", EscolaController.update);
 routes.post("/", EscolaController.create);
-// routes.delete("/:id", EscolaController.deleteOne);
+//routes.delete("/:id", EscolaController.deleteOne);
 
 module.exports = routes;

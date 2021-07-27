@@ -6,7 +6,6 @@ const list = async (req, res) => {
         const { escola_id } = req.params;
 
         // Não sei pq n funciona |const limite = await Limite.findAll();
-
         const limite = await sequelize.query(
             "SELECT * FROM limites WHERE escola_id = ?",
             {
@@ -51,6 +50,7 @@ const update = async (req, res) => {
         }, {
             where: { id: id}
         })*/
+        
         const updated = await sequelize.query(
             "UPDATE limites " +
                 "SET limite = :limite " +

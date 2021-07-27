@@ -39,6 +39,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
     try {
         const escola = await Escola.findAll();
+
         return res.json({
             escola,
         })
@@ -50,7 +51,7 @@ const list = async (req, res) => {
 const listOne = async (req, res) => {
     try {
         const { id } = req.params;
-        
+
         const escola = await Escola.findByPk(id);
         return res.json({
             escola,
@@ -64,6 +65,7 @@ const update = async (req, res) => {
     try {
         const { id } = req.params;
         const { nome } = req.body;
+
         const updated = await Escola.update({ nome }, {
             where: { id: id }
         });

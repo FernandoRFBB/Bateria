@@ -35,6 +35,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
     try {
         const { escola_id } = req.params;
+        
         const usuario = await Usuario.findAll({
             where: { escola_id: escola_id }
         });
@@ -109,6 +110,7 @@ const update = async (req, res) => {
 const deleteOne = async (req, res) => {
     try {
         const { id, escola_id } = req.params;
+
         const deleted = await Usuario.destroy({
             where: { [Op.and]: [
                 { id: id },

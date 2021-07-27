@@ -16,6 +16,7 @@ const Instrumento = require("../models/Instrumento");
 const list = async (req, res) => {
     try {
         const instrumento = await Instrumento.findAll();
+        
         return res.json({
             instrumento,
         });
@@ -27,7 +28,7 @@ const list = async (req, res) => {
 const listOne = async (req, res) => {
     try {
         const { id } = req.params;
-        
+
         const instrumento = await Instrumento.findByPk(id);
         return res.json({
             instrumento,
