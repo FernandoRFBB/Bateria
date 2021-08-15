@@ -138,7 +138,7 @@ const tamanhos = async (req, res) => {
 
 module.exports = {
     create,
-    list,
+    list, 
     listOne,
     update,
     // deleteOne,

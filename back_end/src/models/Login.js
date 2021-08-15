@@ -14,7 +14,7 @@ class Login extends Model {
     static associate(models) {
         this.belongsTo(models.Escola, {
             foreignKey: "escola_id", as: "escola"
-        })
+        }) 
     }
 }
 

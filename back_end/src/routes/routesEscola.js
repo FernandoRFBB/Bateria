@@ -10,4 +10,4 @@ routes.put("/:id", EscolaController.update);
 routes.post("/", EscolaController.create);
 //routes.delete("/:id", EscolaController.deleteOne);
 
-module.exports = routes;
+module.exports = routes; 

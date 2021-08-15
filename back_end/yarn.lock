@@ -27,7 +27,7 @@
   resolved "https://registry.yarnpkg.com/@azure/ms-rest-js/-/ms-rest-js-2.2.3.tgz#8f0085f7768c69f17b3cdb20ce95728b452dc304"
   integrity sha512-sXOhOu/37Tr8428f32Jwuwga975Xw64pYg1UeUwOBMhkNgtn5vUuNRa3fhmem+I6f8EKoi6hOsYDFlaHeZ52jA==
   dependencies:
-    "@azure/core-auth" "^1.1.4"
+    "@azure/core-auth" "^1.1.4" 
     "@types/node-fetch" "^2.3.7"
     "@types/tunnel" "0.0.1"
     abort-controller "^3.0.0"

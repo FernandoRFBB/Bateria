@@ -9,4 +9,4 @@ routes.post("/criar", LoginController.create);
 routes.get("/isLogged", LoginController.isLogged);
 routes.get("/logout", LoginController.logout);
 
-module.exports = routes;
+module.exports = routes; 

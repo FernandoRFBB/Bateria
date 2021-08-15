@@ -14,7 +14,7 @@ class Limite extends Model {
             foreignKey: "escola_id", as: "escola"
         })
         this.belongsTo(models.Instrumento, {
-            foreignKey: "instrumento_id", as: "instrumento"
+            foreignKey: "instrumento_id", as: "instrumento" 
         })
     }
 }

@@ -11,7 +11,7 @@ app.use(sessions({
     saveUninitialized: false,
     resave: false,
 }))
-
+ 
 
 // Arquivos de rotas
 const routesEscola = require("./routes/routesEscola"); // Importando arquivo de rota

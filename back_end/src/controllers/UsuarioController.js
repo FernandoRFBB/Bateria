@@ -10,7 +10,7 @@ const create = async (req, res) => {
         const { escola_id } = req.params;
         const { nome, cpf, telefone,
                 tam_camisa, tam_calca,
-                tam_calcado, diretor,
+                tam_calcado, diretor, 
                 instrumento_id, foto } = req.body;
 
         const usuario = await Usuario.create({

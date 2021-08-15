@@ -11,7 +11,7 @@ class Escola extends Model {
 
     static associate(models) {
         this.hasMany(models.Usuario, {
-            foreignKey: "escola_id",
+            foreignKey: "escola_id", 
             as: "usuarios"
         })
     }

@@ -10,4 +10,4 @@ routes.put("/:escola_id/:id", UsuarioController.update);
 routes.post("/:escola_id", UsuarioController.create);
 routes.delete("/:escola_id/:id", UsuarioController.deleteOne);
 
-module.exports = routes;
+module.exports = routes; 

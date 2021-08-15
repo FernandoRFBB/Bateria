@@ -26,7 +26,7 @@ const list = async (req, res) => {
 
 const listOne = async (req, res) => {
     try {
-        if (req.session.usuario_id == null) {
+        if (req.session.usuario_id == null) { 
             return res.json({message: "Não logado"});
         }
         const { instrumento_id, escola_id } = req.params;

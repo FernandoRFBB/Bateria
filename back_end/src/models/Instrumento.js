@@ -12,7 +12,7 @@ class Instrumento extends Model {
 
     static associate(models) {
         this.hasMany(models.Usuario, {
-            foreignKey: "instrumento_id",
+            foreignKey: "instrumento_id", 
             as: "usuarios"
         })
     }

@@ -9,4 +9,4 @@ routes.put("/:id", InstrumentoController.update);
 //routes.post("/", InstrumentoController.create);
 //routes.delete("/:id", InstrumentoController.deleteOne);
 
-module.exports = routes;
+module.exports = routes; 

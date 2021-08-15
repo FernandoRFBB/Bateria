@@ -15,7 +15,7 @@ class Usuario extends Model {
             sequelize
         })
     }
-    static associate(models) {
+    static associate(models) { 
         this.belongsTo(models.Escola, {
             foreignKey: "escola_id", as: "escola"
         })

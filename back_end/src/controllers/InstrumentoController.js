@@ -5,7 +5,7 @@ const Instrumento = require("../models/Instrumento");
 //         const { nome, foto } = req.body;
 
 //         const instrumento = await Instrumento.create({ nome, foto });
-//         return res.json({
+//         return res.json({ 
 //             instrumento,
 //         });
 //     } catch (error) {

@@ -43,7 +43,7 @@ const login = async (req, res) => {
         })
         if (usuario == null) {
             return res.json({message: "Usuario inválido", erro: 0});
-        };
+        }; 
         if (await bcrypt.compare(senha, usuario.senha)) {
             req.session.usuario_id = usuario.id;
             req.session.escola_id = usuario.escola_id;
