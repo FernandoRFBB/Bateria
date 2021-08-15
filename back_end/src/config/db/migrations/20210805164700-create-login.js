@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.createTable("usuarios", {
+    return queryInterface.createTable("logins", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -13,24 +13,13 @@ module.exports = {
         type: Sequelize.STRING(64),
         allowNull: false,
       },
-      cpf: {
-        type: Sequelize.INTEGER(11),
+      email: {
+        type: Sequelize.STRING(64),
+        allowNull: false,
       },
-      telefone: {
-        type: Sequelize.INTEGER(11),
-      },
-      tam_camisa: {
-        type: Sequelize.STRING(7),
-      },
-      tam_calca: {
-        type: Sequelize.STRING(7),
-      },
-      tam_calcado: {
-        type: Sequelize.INTEGER(2),
-      },
-      diretor: {
-        type: Sequelize.STRING(1),
-        defaultValue: "N",
+      senha: {
+        type: Sequelize.STRING(64),
+        allowNull: false,
       },
       escola_id: {
         type: Sequelize.INTEGER,
@@ -40,13 +29,10 @@ module.exports = {
         },
         onUpdate: "CASCADE",
       },
-      instrumento_id: {
+      nivel: {
         type: Sequelize.INTEGER,
-        references: {
-          model: "instrumentos",
-          key: "id"
-        },
-        onUpdate: "CASCADE",
+        allowNull: false,
+        defaultValue: 0
       },
       created_at: {
         type: Sequelize.DATE,
@@ -60,6 +46,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("usuarios");
+    return queryInterface.dropTable("logins");
   }
 };

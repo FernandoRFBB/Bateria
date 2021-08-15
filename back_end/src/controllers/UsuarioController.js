@@ -4,6 +4,9 @@ const Usuario = require('../models/Usuario');
 
 const create = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { escola_id } = req.params;
         const { nome, cpf, telefone,
                 tam_camisa, tam_calca,
@@ -34,6 +37,10 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
+
         const { escola_id } = req.params;
         
         const usuario = await Usuario.findAll({
@@ -53,6 +60,9 @@ const list = async (req, res) => {
 
 const listOne = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { id, escola_id } = req.params;
 
         const usuario = await Usuario.findAll({
@@ -73,6 +83,9 @@ const listOne = async (req, res) => {
 
 const update = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { id, escola_id } = req.params;
         const { nome, cpf,  telefone,
             tam_camisa, tam_calca,
@@ -109,6 +122,9 @@ const update = async (req, res) => {
 
 const deleteOne = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { id, escola_id } = req.params;
 
         const deleted = await Usuario.destroy({

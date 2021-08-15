@@ -3,6 +3,9 @@ const Limite = require("../models/Limite");
 
 const list = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { escola_id } = req.params;
 
         // Não sei pq n funciona |const limite = await Limite.findAll();
@@ -23,12 +26,15 @@ const list = async (req, res) => {
 
 const listOne = async (req, res) => {
     try {
-        const { id, escola_id } = req.params;
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
+        const { instrumento_id, escola_id } = req.params;
 
         const limite = await sequelize.query(
-            "SELECT * FROM limites WHERE escola_id = :escola_id AND id = :id",
+            "SELECT * FROM limites WHERE escola_id = :escola_id AND instrumento_id = :instrumento_id",
             {
-                replacements: { escola_id: escola_id, id: id }
+                replacements: { escola_id: escola_id, instrumento_id: instrumento_id }
             }
         )
 
@@ -42,7 +48,10 @@ const listOne = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const { id, escola_id } = req.params;
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
+        const { instrumento_id, escola_id } = req.params;
         const { limite } = req.body;
 
         /*const updated = await Limite.update({
@@ -55,21 +64,14 @@ const update = async (req, res) => {
             "UPDATE limites " +
                 "SET limite = :limite " +
                 "WHERE escola_id = :escola_id " +
-                "AND id = :id",
+                "AND instrumento_id = :instrumento_id",
             {
-                replacements: { limite: limite, escola_id: escola_id, id: id }
+                replacements: { limite: limite, escola_id: escola_id, instrumento_id: instrumento_id }
             }
         )
 
-        const resultado = await sequelize.query(
-            "SELECT * FROM limites " +
-                "WHERE id = :id",
-            {
-                replacements: { id: id }
-            }
-        );
         return res.json({
-            resultado
+            updated
         });
     } catch (error) {
         return res.json({error: error.message})

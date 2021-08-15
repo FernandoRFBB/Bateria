@@ -15,6 +15,9 @@ const Instrumento = require("../models/Instrumento");
 
 const list = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const instrumento = await Instrumento.findAll();
         
         return res.json({
@@ -27,6 +30,9 @@ const list = async (req, res) => {
 
 const listOne = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { id } = req.params;
 
         const instrumento = await Instrumento.findByPk(id);
@@ -40,6 +46,9 @@ const listOne = async (req, res) => {
 
 const update = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { id } = req.params;
         const { nome } = req.body;
         const updated = await Instrumento.update({ nome }, {

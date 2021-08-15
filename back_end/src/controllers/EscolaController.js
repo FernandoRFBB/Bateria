@@ -109,6 +109,9 @@ const tamanhos = async (req, res) => {
         // const result = await sequelize.query(
         //     "SELECT tam_camisa, COUNT(id) FROM usuarios GROUP BY tam_camisa"
         //     , { type: QueryTypes.SELECT });
+        if (req.session.usuario_id == null) {
+            return res.json({message: "Não logado"});
+        }
         const { escola_id } = req.params;
         const camisa = await Usuario.findAll({
             attributes: ["tam_camisa", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
