@@ -3,6 +3,9 @@ const bcrypt = require("bcryptjs");
 
 const create = async (req, res) => {
     try {
+        if (req.session.usuario_id == null) {
+            return res.status(550).json({message: "Não logado"});
+        }
         const { nome, email } = req.body;
         const senha = await bcrypt.hash(req.body.senha, 10);
         const usuario = await Login.create({ nome, email, senha, escola_id: req.session.escola_id })

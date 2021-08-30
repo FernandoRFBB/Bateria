@@ -21,9 +21,9 @@ const list = async (req, res) => {
         }
         
         const instrumento = await sequelize.query(
-            "SELECT i.id, i.nome, l.limite, i.foto FROM instrumentos i" + 
-                "INNER JOIN limites l" + 
-                "ON i.id = l.id" +
+            "SELECT i.id, i.nome, l.limite, i.foto FROM instrumentos i " + 
+                "INNER JOIN limites l " + 
+                "ON i.id = l.instrumento_id " +
                 "WHERE l.escola_id = ?",
                 {
                     replacements: [req.session.escola_id]
