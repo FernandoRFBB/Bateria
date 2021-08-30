@@ -28,11 +28,11 @@ const create = async (req, res) => {
         //     console.log(test.dataValues.id);
         // }
 
-        return res.json({
+        return res.status(200).json({
             escola, limites
         });
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
@@ -40,11 +40,11 @@ const list = async (req, res) => {
     try {
         const escola = await Escola.findAll();
 
-        return res.json({
+        return res.status(200).json({
             escola,
         })
     } catch (error) {
-        return res.json({error: error.message})
+        return res.status(500).json({error: error.message})
     }
 }
 
@@ -53,11 +53,11 @@ const listOne = async (req, res) => {
         const { id } = req.params;
 
         const escola = await Escola.findByPk(id);
-        return res.json({
+        return res.status(200).json({
             escola,
         });
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
@@ -72,14 +72,14 @@ const update = async (req, res) => {
 
         if (updated) {
             const escola = await Escola.findByPk(id);
-            return res.json({
+            return res.status(200).json({
                 escola
             });
         }
-        throw new Error("Escola não existe");
+        return res.status(553).json({message: "Escola não existe"});
 
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
@@ -110,29 +110,28 @@ const tamanhos = async (req, res) => {
         //     "SELECT tam_camisa, COUNT(id) FROM usuarios GROUP BY tam_camisa"
         //     , { type: QueryTypes.SELECT });
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado"});
+            return res.status(550).json({message: "Não logado"});
         }
-        const { escola_id } = req.params;
         const camisa = await Usuario.findAll({
             attributes: ["tam_camisa", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: escola_id },
+            where: { escola_id: req.session.escola_id },
             group: ["tam_camisa"],
         })
         const calca = await Usuario.findAll({
             attributes: ["tam_calca", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: escola_id },
+            where: { escola_id: req.session.escola_id },
             group: ["tam_calca"],
         })
         const calcado = await Usuario.findAll({
             attributes: ["tam_calcado", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: escola_id },
+            where: { escola_id: req.session.escola_id },
             group: ["tam_calcado"],
         })
-        return res.json({ 
+        return res.status(200).json({ 
             camisa, calca, calcado
         })
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 

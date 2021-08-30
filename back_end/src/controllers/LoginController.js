@@ -3,33 +3,32 @@ const bcrypt = require("bcryptjs");
 
 const create = async (req, res) => {
     try {
-        const { nome, email, escola_id } = req.body;
+        const { nome, email } = req.body;
         const senha = await bcrypt.hash(req.body.senha, 10);
-        const usuario = await Login.create({ nome, email, senha, escola_id })
-        return res.json({
+        const usuario = await Login.create({ nome, email, senha, escola_id: req.session.escola_id })
+        return res.status(200).json({
             usuario,
         })
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado", erro: 0});
+            return res.status(550).json({message: "Não logado"});
         }
-        const { escola_id } = req.body;
         const usuario = await Login.findAll({
             where: {
-                escola_id: escola_id
+                escola_id: req.session.escola_id
             }
         })
-        return res.json({
+        return res.status(200).json({
             usuario,
         })
     } catch (error) {
-        return res.json({error: error.message})
+        return res.status(500).json({error: error.message});
     }
 }
 
@@ -42,38 +41,36 @@ const login = async (req, res) => {
             }  
         })
         if (usuario == null) {
-            return res.json({message: "Usuario inválido", erro: 0});
-        }; 
-        if (await bcrypt.compare(senha, usuario.senha)) {
+            return res.status(551).json({message: "Usuario inválido"});
+        } else if (await bcrypt.compare(senha, usuario.senha)) {
             req.session.usuario_id = usuario.id;
             req.session.escola_id = usuario.escola_id;
-            return res.json({message: "Bem vindo"})
+            return res.status(200).json({message: "Bem vindo"})
         } else {
-            return res.json({message: "Senha inválida", erro: 1})
+            return res.status(552).json({message: "Senha inválida"})
         };
-
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
 const isLogged = async (req, res) => {
     try {
         if (req.session.usuario_id) {
-            return res.json({message: "Usuario já está logado", user: true});
+            return res.json({message: "Usuario já está logado" });
         }
-        return res.json({message: "Não tem login", user: false});
+        return res.json({message: "Não tem login"});
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
 const logout = async (req, res) => {
     try {
         req.session.destroy();
-        return res.json({message: "Sessão destruida"})
+        return res.status(200).json({message: "Sessão destruida"})
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 

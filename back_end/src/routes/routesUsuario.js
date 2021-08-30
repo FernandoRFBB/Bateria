@@ -4,10 +4,11 @@ const routes = express.Router();
 const UsuarioController = require("../controllers/UsuarioController");
 
 
-routes.get("/:escola_id", UsuarioController.list);
-routes.get("/:escola_id/:id", UsuarioController.listOne);
-routes.put("/:escola_id/:id", UsuarioController.update);
-routes.post("/:escola_id", UsuarioController.create);
-routes.delete("/:escola_id/:id", UsuarioController.deleteOne);
+routes.get("/", UsuarioController.list);
+routes.get("/:id", UsuarioController.listOne);
+routes.get("/instrumento/:instrumento_id", UsuarioController.listByInstrumento)
+routes.put("/:id", UsuarioController.update);
+routes.post("", UsuarioController.create);
+routes.delete("/:id", UsuarioController.deleteOne);
 
 module.exports = routes; 

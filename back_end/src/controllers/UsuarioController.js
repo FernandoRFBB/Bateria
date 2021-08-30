@@ -5,9 +5,9 @@ const Usuario = require('../models/Usuario');
 const create = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado"});
+            return res.status(550).json({message: "Não logado"});
         }
-        const { escola_id } = req.params;
+
         const { nome, cpf, telefone,
                 tam_camisa, tam_calca,
                 tam_calcado, diretor, 
@@ -21,72 +21,93 @@ const create = async (req, res) => {
             tam_calca,
             tam_calcado,
             diretor,
-            escola_id,
+            escola_id: req.session.escola_id,
             instrumento_id,
             foto
         });
         
-        return res.json({
+        return res.status(200).json({
             usuario,
         });
         
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado"});
+            return res.status(550).json({message: "Não logado"});
         }
-
-        const { escola_id } = req.params;
         
-        const usuario = await Usuario.findAll({
-            where: { escola_id: escola_id }
+        const usuarios = await Usuario.findAll({
+            where: { escola_id: req.session.escola_id }
         });
-        if (usuario != 0) {
-            return res.json({
-                usuario,
+        if (usuarios != 0) {
+            return res.status(200).json({
+                usuarios,
             });
         }
-        
-        throw new Error("Escola não encontrada");
+
+        return res.status(200).json({message: "A escola não tem pessoas"});
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
+    }
+}
+
+const listByInstrumento = async (req, res) => {
+    try {
+        if (req.session.usuario_id == null) {
+            return res.status(550).json({message: "Não logado"});
+        }
+
+        const { instrumento_id } = req.params;
+
+        const usuarios = await Usuario.findAll({
+            where: {[Op.and]: [
+                { instrumento_id: instrumento_id }, { escola_id: req.session.escola_id }
+            ]}
+        });
+
+        return res.status(200).json({
+            usuarios
+        });
+
+    } catch (error) {
+        return res.status(500).json({error: error.message});
     }
 }
 
 const listOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado"});
+            return res.statu(550).json({message: "Não logado"});
         }
-        const { id, escola_id } = req.params;
+        const { id } = req.params;
 
         const usuario = await Usuario.findAll({
             where: {[Op.and]: [
-                { id: id }, { escola_id: escola_id }
+                { id: id }, { escola_id: req.session.escola_id }
             ]}
         });
         if (usuario != 0) {
-            return res.json({
+            return res.status(200).json({
                 usuario,
             });
         }
-        throw new Error("Usuario não encontrado");
+        return res.status(553).json({message: "Pessoa não existe"})
     } catch (error) {
-        return res.json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
 const update = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado"});
+            return res.status(550).json({message: "Não logado"});
         }
-        const { id, escola_id } = req.params;
+        const { id } = req.params;
         const { nome, cpf,  telefone,
             tam_camisa, tam_calca,
             tam_calcado, diretor,
@@ -104,44 +125,44 @@ const update = async (req, res) => {
             foto
         }, {
             where: { [Op.and]: [
-                { id: id }, { escola_id: escola_id }
+                { id: id }, { escola_id: req.session.escola_id }
             ]}
         });
 
         if (updated != 0) {
             const usuario = await Usuario.findByPk(id);
-            return res.json({
+            return res.status(200).json({
                 usuario
             })
         }
-        throw new Error("Usuario não encontrado")
+        return res.status(553).json({message: "Pessoa não existe"})
     } catch (error) {
-        return res.json({ error: error.message })
+        return res.status(500).json({error: error.message});
     }
 }
 
 const deleteOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.json({message: "Não logado"});
+            return res.status(550).json({message: "Não logado"});
         }
-        const { id, escola_id } = req.params;
+        const { id } = req.params;
 
         const deleted = await Usuario.destroy({
             where: { [Op.and]: [
                 { id: id },
-                { escola_id: escola_id }
+                { escola_id: req.session.escola_id }
             ]}
         });
 
         if (deleted) {
-            return res.json({
-                message: "Usuario deletado com sucesso"
+            return res.status(200).json({
+                message: "Deletado com sucesso"
             })
         }
-        throw new Error("Usuario não encontrado");
+        return res.status(553).json({message: "Pessoa não existe"});
     } catch (error) {
-        return res.json({ error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
@@ -151,5 +172,6 @@ module.exports = {
     listOne,
     update,
     deleteOne,
+    listByInstrumento
 }
 
