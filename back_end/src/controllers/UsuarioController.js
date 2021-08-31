@@ -11,8 +11,8 @@ const create = async (req, res) => {
         const { nome, cpf, telefone,
                 tam_camisa, tam_calca,
                 tam_calcado, diretor, 
-                instrumento_id, foto } = req.body;
-
+                instrumento_id } = req.body;
+        const foto = escola_id + '_' + nome;
         const usuario = await Usuario.create({
             nome,
             cpf,
@@ -22,7 +22,7 @@ const create = async (req, res) => {
             tam_calcado,
             diretor,
             escola_id: req.session.escola_id,
-            instrumento_id,
+            instrumento_id: instrumento_id,
             foto
         });
         
@@ -165,6 +165,8 @@ const deleteOne = async (req, res) => {
         return res.status(500).json({error: error.message});
     }
 }
+
+
 
 module.exports = {
     create,
