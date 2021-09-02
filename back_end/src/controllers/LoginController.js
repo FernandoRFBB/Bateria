@@ -35,7 +35,7 @@ const list = async (req, res) => {
     }
 }
 
-const login = async (req, res) => {
+const auth = async (req, res) => {
     try {
         const { email, senha } = req.body;
         const usuario = await Login.findOne({
@@ -57,17 +57,6 @@ const login = async (req, res) => {
     }
 }
 
-const isLogged = async (req, res) => {
-    try {
-        if (req.session.usuario_id) {
-            return res.json({message: "Usuario já está logado" });
-        }
-        return res.json({message: "Não tem login"});
-    } catch (error) {
-        return res.status(500).json({error: error.message});
-    }
-}
-
 const logout = async (req, res) => {
     try {
         req.session.destroy();
@@ -80,7 +69,6 @@ const logout = async (req, res) => {
 module.exports = {
     create,
     list,
-    login,
-    isLogged,
+    auth,
     logout
 }

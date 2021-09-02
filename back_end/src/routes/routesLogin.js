@@ -4,9 +4,8 @@ const routes = express.Router();
 const LoginController = require("../controllers/LoginController")
 
 routes.get("/", LoginController.list);
-routes.post("/", LoginController.login);
-routes.post("/criar", LoginController.create);
-routes.get("/isLogged", LoginController.isLogged);
+routes.post("/", LoginController.create);
+routes.post("/auth", LoginController.auth);
 routes.get("/logout", LoginController.logout);
 
 module.exports = routes; 

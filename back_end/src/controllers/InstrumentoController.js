@@ -1,18 +1,20 @@
 const { sequelize } = require("../models/Instrumento");
 const Instrumento = require("../models/Instrumento");
 
-// const create = async (req, res) => {
-//     try {
-//         const { nome, foto } = req.body;
+const create = async (req, res) => {
+    try {
+        const { nome, foto } = req.body;
 
-//         const instrumento = await Instrumento.create({ nome, foto });
-//         return res.json({ 
-//             instrumento,
-//         });
-//     } catch (error) {
-//         return res.json({error: error.message});
-//     }
-// }
+        // se quiser criar outros depois verificar o req.session.escola_id para so adicionar naquela escola
+        
+        const instrumento = await Instrumento.create({ nome, foto });
+        return res.json({ 
+            instrumento,
+        });
+    } catch (error) {
+        return res.json({error: error.message});
+    }
+}
 
 const list = async (req, res) => {
     try {
@@ -101,7 +103,7 @@ const update = async (req, res) => {
 // }
 
 module.exports = {
-    // create,
+    create,
     list,
     listOne,
     update,

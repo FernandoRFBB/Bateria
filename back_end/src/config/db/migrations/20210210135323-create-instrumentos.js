@@ -13,6 +13,9 @@ module.exports = {
         type: Sequelize.STRING(20),
         allowNull: false,
       },
+      foto: {
+        type: Sequelize.STRING(20)
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

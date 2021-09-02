@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
         cb(null, './fotos/'); // Falando onde vai guardar a imagem
     },
     filename: function(req, file, cb) {
-        cb(null, req.body.escola_id + '_' + req.body.nome + '.jpeg'); // Guardando o nome do arquivo
+        cb(null, file.originalname); // Guardando o nome do arquivo
     }
 })
 
@@ -34,7 +34,8 @@ let upload = multer({
 
 routes.get("/", UsuarioController.list);
 routes.get("/:id", UsuarioController.listOne);
-routes.get("/instrumento/:instrumento_id", UsuarioController.listByInstrumento)
+routes.get("/instrumento/:instrumento_id", UsuarioController.listByInstrumento);
+routes.get("/foto/:id", UsuarioController.foto);
 routes.put("/:id", UsuarioController.update);
 routes.post("/", upload.single("foto"), UsuarioController.create);
 routes.delete("/:id", UsuarioController.deleteOne);

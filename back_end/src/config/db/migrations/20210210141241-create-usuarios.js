@@ -14,10 +14,11 @@ module.exports = {
         allowNull: false,
       },
       cpf: {
-        type: Sequelize.INTEGER(11),
+        type: Sequelize.STRING(11),
+        unique: true
       },
       telefone: {
-        type: Sequelize.INTEGER(11),
+        type: Sequelize.STRING(11),
       },
       tam_camisa: {
         type: Sequelize.STRING(7),
@@ -29,8 +30,11 @@ module.exports = {
         type: Sequelize.INTEGER(2),
       },
       diretor: {
-        type: Sequelize.STRING(1),
-        defaultValue: "N",
+        type: Sequelize.INTEGER(1),
+        defaultValue: 0,
+      },
+      foto: {
+        type: Sequelize.STRING(20),
       },
       escola_id: {
         type: Sequelize.INTEGER,

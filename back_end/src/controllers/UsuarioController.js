@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 const { sequelize } = require('../models/Usuario');
 const Usuario = require('../models/Usuario');
+const fs = require('fs');
+const path = require('path');
 
 const create = async (req, res) => {
     try {
@@ -12,7 +14,6 @@ const create = async (req, res) => {
                 tam_camisa, tam_calca,
                 tam_calcado, diretor, 
                 instrumento_id } = req.body;
-        const foto = escola_id + '_' + nome;
         const usuario = await Usuario.create({
             nome,
             cpf,
@@ -22,16 +23,34 @@ const create = async (req, res) => {
             tam_calcado,
             diretor,
             escola_id: req.session.escola_id,
-            instrumento_id: instrumento_id,
-            foto
+            instrumento_id,
         });
-        
+
+        // colocando o campo foto como o id.jpeg
+        usuario.foto = usuario.id + ".jpeg"
+        await usuario.save();
+
+        // renomeando o nome do arquivo padrão para o id.jpeg
+        fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
+            if (error) {
+                return res.status(500).json({error: error});
+            }
+        })
+
         return res.status(200).json({
             usuario,
         });
         
     } catch (error) {
         return res.status(500).json({error: error.message});
+    }
+}
+
+const foto = async (req, res) => {
+    try {
+        return res.status(200).sendFile(path.resolve(__dirname, "..", "..", "fotos", req.params.id + ".jpeg"));
+    } catch (error) {
+        return res.status(500).json({error: error.message})
     }
 }
 
@@ -170,10 +189,10 @@ const deleteOne = async (req, res) => {
 
 module.exports = {
     create,
+    foto,
     list,
     listOne,
     update,
     deleteOne,
-    listByInstrumento
+    listByInstrumento,
 }
-
