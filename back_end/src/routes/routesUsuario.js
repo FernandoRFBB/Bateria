@@ -36,7 +36,7 @@ routes.get("/", UsuarioController.list);
 routes.get("/:id", UsuarioController.listOne);
 routes.get("/instrumento/:instrumento_id", UsuarioController.listByInstrumento);
 routes.get("/foto/:id", UsuarioController.foto);
-routes.put("/:id", UsuarioController.update);
+routes.put("/:id", upload.single("foto"), UsuarioController.update);
 routes.post("/", upload.single("foto"), UsuarioController.create);
 routes.delete("/:id", UsuarioController.deleteOne);
 

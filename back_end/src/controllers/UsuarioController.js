@@ -101,7 +101,7 @@ const listByInstrumento = async (req, res) => {
 const listOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.statu(550).json({message: "Não logado"});
+            return res.status(550).json({message: "Não logado"});
         }
         const { id } = req.params;
 
@@ -130,7 +130,7 @@ const update = async (req, res) => {
         const { nome, cpf,  telefone,
             tam_camisa, tam_calca,
             tam_calcado, diretor,
-            instrumento_id, foto } = req.body;
+            instrumento_id } = req.body;
 
         const updated = await Usuario.update({
             nome,
@@ -141,15 +141,24 @@ const update = async (req, res) => {
             tam_calcado,
             diretor,
             instrumento_id,
-            foto
         }, {
             where: { [Op.and]: [
                 { id: id }, { escola_id: req.session.escola_id }
             ]}
         });
 
+        const usuario = await Usuario.findByPk(id);
+        
+        if (req.file) {
+            // renomeando o nome do arquivo padrão para o id.jpeg
+            fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
+                if (error) {
+                    return res.status(500).json({error: error});
+                }
+            })
+        }
+
         if (updated != 0) {
-            const usuario = await Usuario.findByPk(id);
             return res.status(200).json({
                 usuario
             })
@@ -173,6 +182,12 @@ const deleteOne = async (req, res) => {
                 { escola_id: req.session.escola_id }
             ]}
         });
+
+        fs.unlink('./fotos/' + id + '.jpeg', (error) => {
+            if (error) {
+                return res.status(500).json({error: error.message});
+            }
+        })
 
         if (deleted) {
             return res.status(200).json({
