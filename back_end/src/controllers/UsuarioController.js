@@ -31,7 +31,7 @@ const create = async (req, res) => {
         await usuario.save();
 
         // renomeando o nome do arquivo padrão para o id.jpeg
-        fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
+        await fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
             if (error) {
                 return res.status(500).json({error: error});
             }
@@ -156,7 +156,7 @@ const update = async (req, res) => {
         
         if (req.file) {
             // renomeando o nome do arquivo padrão para o id.jpeg
-            fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
+            await fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
                 if (error) {
                     return res.status(500).json({error: error});
                 }
@@ -189,7 +189,7 @@ const deleteOne = async (req, res) => {
 
         // Se realmente existir um usuario desse na escola, tirar a foto. PRevenindo excluir a foto;
         if (deleted) {
-            fs.unlink('./fotos/' + id + '.jpeg', (error) => {
+            await fs.unlink('./fotos/' + id + '.jpeg', (error) => {
                 if (error) {
                     return res.status(500).json({error: error.message});
                 }
@@ -197,9 +197,9 @@ const deleteOne = async (req, res) => {
             return res.status(200).json({
                 message: "Deletado com sucesso"
             })
+        } else {
+            return res.status(553).json({message: "Pessoa não existe"});
         }
-
-        return res.status(553).json({message: "Pessoa não existe"});
     } catch (error) {
         return res.status(500).json({error: error.message});
     }
