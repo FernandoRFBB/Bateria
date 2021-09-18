@@ -31,6 +31,7 @@ const create = async (req, res) => {
         await usuario.save();
 
         // renomeando o nome do arquivo padrão para o id.jpeg
+        console.warn(usuario.id)
         fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
             if (error) {
                 return res.status(500).json({error: error});
@@ -105,12 +106,12 @@ const listOne = async (req, res) => {
         }
         const { id } = req.params;
 
-        const usuario = await Usuario.findAll({
+        const usuario = await Usuario.findOne({
             where: {[Op.and]: [
                 { id: id }, { escola_id: req.session.escola_id }
             ]}
         });
-
+        
         if (usuario != 0) {
             return res.status(200).json({
                 usuario,
@@ -148,7 +149,7 @@ const update = async (req, res) => {
             ]}
         });
 
-        const usuario = await Usuario.findAll({
+        const usuario = await Usuario.findOne({
             where: {[Op.and]: [
                 { id: id }, { escola_id: req.session.escola_id }
             ]}
@@ -187,18 +188,18 @@ const deleteOne = async (req, res) => {
             ]}
         });
 
-        fs.unlink('./fotos/' + id + '.jpeg', (error) => {
-            if (error) {
-                return res.status(500).json({error: error.message});
-            }
-        })
-
+        // Se realmente existir um usuario desse na escola, tirar a foto. PRevenindo excluir a foto;
         if (deleted) {
+            fs.unlink('./fotos/' + id + '.jpeg', (error) => {
+                if (error) {
+                    return res.status(500).json({error: error.message});
+                }
+            })
             return res.status(200).json({
                 message: "Deletado com sucesso"
             })
         }
-        
+
         return res.status(553).json({message: "Pessoa não existe"});
     } catch (error) {
         return res.status(500).json({error: error.message});
