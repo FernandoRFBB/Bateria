@@ -48,7 +48,7 @@ const create = async (req, res) => {
 
 const foto = async (req, res) => {
     try {
-        return res.status(200).sendFile(path.resolve(__dirname, "..", "..", "fotos", req.params.id));
+        return res.status(200).sendFile(path.resolve(__dirname, "..", "..", "fotos", req.params.id + ".jpeg"));
     } catch (error) {
         return res.status(500).json({error: error.message})
     }
@@ -155,12 +155,6 @@ const update = async (req, res) => {
         });
         
         if (req.file) {
-            // Removendo a foto e depois criando outra
-            fs.unlink('./fotos/' + id + '.jpeg', (error) => {
-                if (error) {
-                    return res.status(500).json({error: error.message});
-                }
-            })
             // renomeando o nome do arquivo padrão para o id.jpeg
             fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
                 if (error) {
