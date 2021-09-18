@@ -110,6 +110,7 @@ const listOne = async (req, res) => {
                 { id: id }, { escola_id: req.session.escola_id }
             ]}
         });
+
         if (usuario != 0) {
             return res.status(200).json({
                 usuario,
@@ -147,7 +148,11 @@ const update = async (req, res) => {
             ]}
         });
 
-        const usuario = await Usuario.findByPk(id);
+        const usuario = await Usuario.findAll({
+            where: {[Op.and]: [
+                { id: id }, { escola_id: req.session.escola_id }
+            ]}
+        });
         
         if (req.file) {
             // renomeando o nome do arquivo padrão para o id.jpeg
@@ -158,7 +163,7 @@ const update = async (req, res) => {
             })
         }
 
-        if (updated != 0) {
+        if (usuario != 0) {
             return res.status(200).json({
                 usuario
             })
@@ -177,9 +182,8 @@ const deleteOne = async (req, res) => {
         const { id } = req.params;
 
         const deleted = await Usuario.destroy({
-            where: { [Op.and]: [
-                { id: id },
-                { escola_id: req.session.escola_id }
+            where: {[Op.and]: [
+                { id: id }, { escola_id: req.session.escola_id }
             ]}
         });
 
@@ -194,6 +198,7 @@ const deleteOne = async (req, res) => {
                 message: "Deletado com sucesso"
             })
         }
+        
         return res.status(553).json({message: "Pessoa não existe"});
     } catch (error) {
         return res.status(500).json({error: error.message});
