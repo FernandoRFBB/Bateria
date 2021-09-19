@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.STRING(7),
       },
       tam_calcado: {
-        type: Sequelize.INTEGER(2),
+        type: Sequelize.STRING(2),
       },
       diretor: {
         type: Sequelize.INTEGER(1),

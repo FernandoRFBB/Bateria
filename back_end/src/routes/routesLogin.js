@@ -7,5 +7,6 @@ routes.get("/", LoginController.list);
 routes.post("/", LoginController.create);
 routes.post("/auth", LoginController.auth);
 routes.get("/logout", LoginController.logout);
+routes.get("/isLogged", LoginController.isLogged);
 
 module.exports = routes; 

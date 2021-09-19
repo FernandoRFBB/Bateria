@@ -27,7 +27,7 @@ module.exports = {
         onUpdate: "CASCADE",
       },
       limite: {
-        type: Sequelize.INTEGER(3),
+        type: Sequelize.STRING(5),
       },
       created_at: {
         type: Sequelize.DATE,

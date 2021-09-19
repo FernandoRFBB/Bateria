@@ -35,6 +35,18 @@ const list = async (req, res) => {
     }
 }
 
+const isLogged = async (req, res) => {
+    try {
+        if (req.session.usuario_id == null) {
+            return res.status(510).json({message: "Não logado"});
+        } else {
+            return res.status(200).json({message: "Logado"});
+        }
+    } catch (error) {
+        return res.status(500).json({error: error.message})
+    }
+}
+
 const auth = async (req, res) => {
     try {
         const { email, senha } = req.body;
@@ -70,5 +82,6 @@ module.exports = {
     create,
     list,
     auth,
-    logout
+    logout,
+    isLogged
 }
