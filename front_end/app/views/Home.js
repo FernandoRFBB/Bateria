@@ -1,74 +1,77 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Modal, Platform } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import React, { useState, useEffect } from 'react';
+import { Text, View, ScrollView, Modal, Platform } from "react-native";
 import { showMessage } from "react-native-flash-message"
-
-// import { yupResolver } from '@hookform/resolvers/yup';
-// import * as yup from "yup";
+import { Formik, getIn } from 'formik'
+import * as yup from "yup";
 import { Button, Card, FAB, Title } from "react-native-paper";
+import Botao from "../components/Botao"
 
-import Input from "../components/Input";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// const schema = yup.object().shape({
-    // limite: yup.number()
-    //     .typeError("Limite precisa ser numero")
-    //     .min(0, "Tamanho muito pequeno")
-    //     .max(200, "Tamanho muito grande")
-    //     .required("Nome é obrigatório")
-// })
+import styles from '../css/styles'
+import api from '../services/api'
+import Input from "../components/Input"
+
+const schema = yup.object().shape({
+    limite: yup.number()
+        .typeError("Limite precisa ser numero")
+        .min(0, "Tamanho muito pequeno")
+        .max(200, "Tamanho muito grande")
+        .required("Não pode deixar em branco")
+})
 
 export default function Home({ navigation, route }) {
-  const [ instrumentos ] = useState([
-    {
-      id: 0,
-      nome: "Caixa",
-    },
-    {
-      id: 1,
-      nome: "Chocalho",
-    },
-    {
-      id: 2,
-      nome: "Cuica",
-    },
-    {
-      id: 3,
-      nome: "Pandeiro",
-    },
-    {
-      id: 4,
-      nome: "Repique",
-    },
-    {
-      id: 5,
-      nome: "Surdo 1",
-    },
-    {
-      id: 6,
-      nome: "Surdo 2",
-    },
-    {
-      id: 7,
-      nome: "Tamborim",
-    },
-  ]);
+
+  const [ instrumentos, setInstrumentos ] = useState([]);
   const [ mudarLimite, setMudarLimite ] = useState(false);
-  const [ limite, setLimite ] = useState("");
-  const { control, handleSubmit, errors } = useForm({
-        // resolver: yupResolver(schema),
-  });
+  const [ objLimite, setObjLimite ] = useState(999);
+
   const onSubmit = data => {
     console.log(data);
     setMudarLimite(false);
+    showMessage({
+      message: "Limite atualizado",
+      type: "success"
+    })
+    navigation.navigate("Home", { limite: true });
   }
+
+  const getInstrumentos = async () => {
+    try {
+      var response = await api.get("/instrumentos");
+      
+      // COlocando 0 no final porque ele traz um array dentro de um array
+      setInstrumentos(response.data.instrumento[0]);
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+  
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@isLogged')
+      if(value !== null) {
+        console.log("Foi :)")
+      } else {
+        console.log("nao foi D:")
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  useEffect(() => {
+    getInstrumentos();
+    getData();
+  }, []);
 
   return (
     <View>
       <ScrollView>
         {instrumentos.map((i) =>
-        <View>
+        <View key={i.id}>
           <Title style={{alignSelf: "center", marginTop: 10}}>{i.nome}</Title>
-          <Text style={{alignSelf: "center"}} onPress={() => {setMudarLimite(true); setLimite(40)}}>Limite: 40</Text>
+          <Text style={styles.limiteText} onPress={() => {setMudarLimite(true); setObjLimite(i.id);}}>Limite: {i.limite}</Text>
           <Text style={{alignSelf: "center", color: "red", marginBottom: 10,}}>Faltam 4 pessoas</Text>
           <Card style={{ marginBottom: 20, marginHorizontal: 20}}>
             <Card.Cover source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Repique.JPG" }} />
@@ -84,7 +87,7 @@ export default function Home({ navigation, route }) {
         </View>
         )}
       </ScrollView>
-      <Modal 
+      {/* <Modal 
         animationType="fade"
         transparent={true}
         visible={mudarLimite}
@@ -92,78 +95,45 @@ export default function Home({ navigation, route }) {
       >
         <View style={styles.centerView}>
           <View style={styles.modalView}>
-            <Title style={{alignSelf: "center"}}>Limite:</Title>
-            <Controller
-              defaultValue="40"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  onChangeText={(value) => onChange(value)}
-                  value={value}
-                  keyboardType={Platform.OS === 'ios'? "number-pad" : "numeric" }
-                  maxLength={3}
-                />
-              )}
-              name="limite"
-            />
-            <TouchableOpacity style={[styles.button, {marginTop: 10}]}
-              onPress={handleSubmit(onSubmit)}
-            >
-              <Text style={{color: "white"}}>Confirmar</Text>
-            </TouchableOpacity>
+            <Title style={styles.limiteText}>Limite</Title>
+            <View>
+              <Formik
+                initialValues={{limite: '40', id: objLimite}}
+                validationSchema={schema}
+                onSubmit={(values) => onSubmit(values)}
+              >
+                {({ handleChange, handleBlur, handleSubmit, errors, values, isValid }) => (
+                  <View>
+                    <Input
+                      defaultValue={'40'}
+                      error={errors.sapato}
+                      onBlur={handleBlur("limite")}
+                      onChangeText={handleChange('limite')}
+                      textAlign={"center"}
+                      keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                      maxLength={2}
+                      value={values.limite}
+                      style={[styles.boxInput, { borderColor: "black", paddingLeft: 75 }]}
+                    />
+                    <Botao
+                      botaoStyle={{marginTop: 10, backgroundColor: isValid ? 'black' : '#CACFD2', borderRadius: 0 }}
+                      texto={'Enviar'}
+                      onPress={handleSubmit}
+                      disabled={!isValid}                      
+                    />
+                  </View>
+                )}
+              </Formik>
+            </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
       <FAB
         style={styles.fab}
         icon="plus"
         onPress={() => navigation.navigate("PegarImagem",
-          { instrumento: "", tela: "Home" })}
+          { instrumento: "1", tela: "Home" })}
       />
-      {route.params?.created &&
-        showMessage({
-          message: "Usuario criado com sucesso",
-          type: "success"
-        })
-      }
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  fab: {
-    position: "absolute",
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-  button: {
-    alignItems: "center",
-    backgroundColor: "black",
-    borderRadius: 10,
-    marginHorizontal: "20%",
-    marginBottom: 20,
-    padding: 10,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  centerView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
-  },
-});

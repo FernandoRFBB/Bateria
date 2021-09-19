@@ -1,36 +1,27 @@
-import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import RNPickerSelect from "react-native-picker-select"
+import styles from '../css/styles'
 
 export default function Select(props) {
 
     const list = [];
     props.objects.map(cr => {
-        list.push({label: cr, value: cr, inputLabel: cr})
+        list.push({label: cr.nome, value: cr.id})
     })
 
     return (
         <View>
-            { props.error && (
-                <Text style={styles.errorMessage}>{props.error.message}</Text>                
-            )}
-            <RNPickerSelect
-                useNativeAndroidPickerStyle={false}
-                style={pickerStyles}
-                items={list}
-                {...props}
-            />
+          <RNPickerSelect
+            useNativeAndroidPickerStyle={false}
+            style={pickerStyles}
+            items={list}
+            {...props}
+          />
         </View>
     )
 }
 
-const styles = StyleSheet.create({
-  errorMessage: {
-    color: "red",
-    marginHorizontal: 30,
-    marginBottom: 2,
-  },
-})
 
 const pickerStyles = StyleSheet.create({
   inputIOS: {

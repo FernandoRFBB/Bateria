@@ -1,755 +1,91 @@
-import React, { useState } from "react"
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Pressable } from "react-native"
+import React, { useEffect, useState } from "react"
+import { View, Text, ScrollView, TouchableOpacity, Modal, Image, RefreshControl } from "react-native"
 import { FAB } from "react-native-paper";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { showMessage } from "react-native-flash-message"
+// import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/Fontisto"
+import { useIsFocused } from "@react-navigation/native"
+
+import styles from "../css/styles"
+import Botao from "../components/Botao";
+import api from '../services/api'
+import { showMessage } from "react-native-flash-message";
 
 export default function Tabela ({navigation, route}) {
 
-  const [ usuarios ] = useState([
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  const [ usuarios, setUsuarios ] = useState([]);
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  const getUsuarios = async () => {
+    try {
+      var response = await api.get("/usuarios/instrumento/" + route.params.instrumento_id);
+      
+      // Colocando 0 no final porque ele traz um array dentro de um array
+      setUsuarios(response.data.usuarios);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-       {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  const isFocused = useIsFocused();
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-       {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  // Preciso dessa variavel pra gambiarra, quando ela atualizar, no caso quando for deletar o usuario, ele vai dar refresh na pagina automaticamente
+  const [ del, setDel ] = useState(false);
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  const [ deletar, setDeletar ] = useState(false); // Ativar o modal para confirmar a exclusão do usuario
+  const [ deletarNome, setDeletarNome ] = useState(""); // Nome do usuario a ser deletado, para aparecer no modal
+  const [ deletado, setDeletado ] = useState(false);
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  // RECARREGAR A PAGINA
+  
+  const [refreshing, setRefreshing] = useState(false);
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getUsuarios();
+    setRefreshing(false);
+  })
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 0,
-        nome: "Fernando",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 1,
-        nome: "Bruno",
-        idade: 111111111,
-        camisa: "M",
-        calca: "GG",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 6,
-        nome: "Joao",
-        idade: 111111111,
-        camisa: "XG",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 2,
-        nome: "Pedro",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true
-      },
 
-      {
-        id: 3,
-        nome: "Ana",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: false,
-      },
-      {
-        id: 4,
-        nome: "Bruna",
-        idade: 111111111,
-        camisa: "M",
-        calca: "XG",
-        sapato: "30",
-        diretor: false
-      },
-      {
-        id: 5,
-        nome: "Rodolfo",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 7,
-        nome: "SSSSSSS",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-      {
-        id: 8,
-        nome: "ZZZZZZZZZZ",
-        idade: 111111111,
-        camisa: "M",
-        calca: "G",
-        sapato: "30",
-        diretor: true,
-      },
-  ]);
+  useEffect(() => {
+    // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
+    if (isFocused) {
+      getUsuarios();
+    }
+    return () => {
+      setUsuarios([]);
+    }
+  }, [isFocused]);
+
+  const remover = async () => {
+    try {
+
+      setDel(true);
+
+      var url = "/usuarios/" + pressId;
+      var response = await api.delete(url);
+      console.log(response);
+      showMessage({
+        message: "Usuario deletado com sucesso",
+        type: "danger"
+      }) 
+
+      setDeletado(true);
+      setDeletar(false);
+      setOpen(false);
+      setDel(false);
+      onRefresh();
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   // Quantos itens aparecem por pagina || Meu medo desse método é ter que carregar muito usuario de uma vez, desencessariamente.
-  const [ qtdPorPagina, setQtdPorPagina ] = useState([50]);
+  const [ qtdPorPagina, setQtdPorPagina ] = useState(4);
   const [ pagina, setPagina ] = useState(0);
   const [ ordemDecrescente, setOrdemDecrescente ] = useState(false);
+  const [ open, setOpen ] = useState(false);
+  const [ pressId, setPressId ] = useState(0);
   const usuariosOrdenados = usuarios
     .slice()
     .sort((item1, item2) =>
@@ -760,12 +96,27 @@ export default function Tabela ({navigation, route}) {
   // Seta o numero do primeiro item da lista naquela pagina
   const comeco = pagina * qtdPorPagina;
   const final = ( pagina + 1 ) * qtdPorPagina;
+
+
   return(
     <View style={{flex: 1}}>
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.containerTabela}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         <View style={styles.header}>
           <View style={styles.primeiraColuna}>
-            <Text style={styles.textoTitulo}>Nome</Text>
+            <TouchableOpacity onPress={() => setOrdemDecrescente(!ordemDecrescente)}>
+              <Text style={styles.textoTitulo}>
+                Nome
+                <Icon name={ordemDecrescente ? "arrow-up-l" : "arrow-down-l"}/>
+              </Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.restoColunas}>
             <View style={styles.col}>
@@ -780,39 +131,81 @@ export default function Tabela ({navigation, route}) {
           </View>
         </View>
         {usuariosOrdenados.slice(comeco, final).map((usuario) =>
-          <Pressable onPress={() => {
-          console.log(usuario.id);
-          }}>
-            <View style={styles.linha}>
-              <View style={styles.primeiraColuna}>
-                <Text>{usuario.nome}</Text>
+        <View key={usuario.id}>
+          <TouchableOpacity
+            onPress={() => {
+              // Verificar se o user pressionado é o mesmo, se for ele so fecha as opcoes
+              if (usuario.id != pressId) {
+                setPressId(usuario.id);
+                setOpen(true);
+              } else {
+                setOpen(!open)
+              }
+            }}>
+              <View style={[styles.linha, {
+                backgroundColor: open && pressId === usuario.id ? "#cfcfcf" : "#f0f0f0",
+              }]}>
+                <View style={styles.primeiraColuna}>
+                  <Text>{usuario.nome}</Text>
+                </View>
+                <View style={styles.restoColunas}>
+                  <View style={styles.col}>
+                    <Text style={styles.textoColuna}>{usuario.camisa}</Text>
+                  </View>
+                  <View style={styles.col}>
+                    <Text style={styles.textoColuna}>{usuario.calca}</Text>
+                  </View>
+                  <View style={styles.col}>
+                    <Text style={styles.textoColuna}>{usuario.sapato}</Text>
+                  </View>
+                </View>
               </View>
-              <View style={styles.restoColunas}>
-                <View style={styles.col}>
-                  <Text style={styles.text}>{usuario.camisa}</Text>
-                </View>
-                <View style={styles.col}>
-                  <Text style={styles.text}>{usuario.calca}</Text>
-                </View>
-                <View style={styles.col}>
-                  <Text style={styles.text}>{usuario.sapato}</Text>
-                </View>
+          </TouchableOpacity>
+          {open && pressId == usuario.id && (
+            <View
+              style={styles.tabelaOp}>
+              <View>
+                <TouchableOpacity onPress={() => navigation.navigate("UsuarioForm", { usuario: pressId, tela: "Tabela", ver: true })}>
+                  <Icon
+                    name="preview"
+                    size={30}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View>
+                <TouchableOpacity onPress={() => navigation.navigate("UsuarioForm", { usuario: pressId, tela: "Tabela", editar: true})}>
+                  <Icon
+                    name="save-1"
+                    size={30}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View>
+              <TouchableOpacity onPress={() => {setDeletar(true), setDeletarNome(usuario.nome)}}>
+                  <Icon
+                    name="close"
+                    size={30}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
-          </Pressable>
+          )}
+        </View>
         )}
         <View style={styles.paginacao}>
           <View style={styles.textoPaginacao}>
             <Text>
-              {`${comeco + 1} - ${final < usuarios.length ? final : usuarios.length} de ${usuariosOrdenados.length}`}
+              {/* Para n ficar 9 - 13 por exemplo, sendo que só tem 10 pessoas, ai fica 9 - 10 */}
+              {`${comeco + 1} - ${final < usuarios.length ? final : usuarios.length} de ${usuarios.length}`}
             </Text>
           </View>
           <TouchableOpacity
-            onPress={() =>  comeco > 0 ? setPagina(pagina - 1) : ""}
+            onPress={() => comeco > 0 ? setPagina(pagina - 1) : ""}
             style={styles.botaoPaginacao}
           >
             <Icon
-              name="angle-left" 
+              name="angle-left"
+              color={ comeco == 0 ? '#CACFD2': 'black' }
               size={25}
             />
           </TouchableOpacity>
@@ -822,91 +215,45 @@ export default function Tabela ({navigation, route}) {
           >
             <Icon
               name="angle-right"
+              color={ final <= usuarios.length ? 'black' : '#CACFD2' }
               size={25}
             />
           </TouchableOpacity>
         </View>
         <View style={{marginBottom: 100}}/>
       </ScrollView>
+      <Modal 
+        animationType="fade"
+        transparent={true}
+        visible={deletar}
+        onRequestClose={() => {setDeletar(false)}}
+      >
+        <View style={styles.centerView}>
+          <View style={[styles.modalView, { flex: 1, maxHeight: 250, justifyContent: 'center', maxWidth: 300 }]}>
+            <Text>Tem certeza que deseja deletar {deletarNome}?</Text>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 30}}>
+              <Botao
+                botaoStyle={{ padding: 20, marginHorizontal: "25%" }}
+                texto="Voltar"
+                onPress={() => setDeletar(false)}
+                disabled={del}
+              />
+              <Botao
+                botaoStyle={{ padding: 20, marginHorizontal: "25%" }}
+                texto="Deletar"
+                onPress={remover}
+                disabled={del}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
       <FAB
         style={styles.fab}
         icon="plus"
         onPress={() => navigation.navigate("PegarImagem",
-          { instrumento: route.params.instrumento_id, tela: "Tabela" })}
+          { instrumento_id: route.params.instrumento_id, tela: "Tabela" })}
       />
-      {route.params?.created &&
-        showMessage({
-        message: "Usuario criado com sucesso",
-        type: "success"
-        })
-      }
     </View> 
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  header: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: "gray",
-    maxHeight: 30,
-    minHeight: 20,
-  },
-  linha: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: "grey",
-    maxHeight: 40,
-    minHeight: 40,
-    alignItems: "center"
-  },
-  primeiraColuna: {
-    flex: 1,
-    marginLeft: 10
-  },
-  restoColunas: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginRight: 10,
-  },
-  text: {
-    alignSelf: "center"
-  },
-  textoTituloColuna: {
-    alignSelf: "center",
-    fontWeight: "bold"
-  },
-  textoTitulo: {
-    fontWeight: "bold",
-  },
-  col: {
-    flex: 1,
-  },
-  paginacao: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingRight: 10
-  },
-  textoPaginacao: {
-    alignSelf: "center"
-  },
-  botaoPaginacao: {
-    padding: 10,
-  },
-  fab: {
-    position: "absolute",
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-})
