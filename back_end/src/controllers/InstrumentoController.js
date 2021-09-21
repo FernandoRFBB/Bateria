@@ -1,5 +1,6 @@
 const { sequelize } = require("../models/Instrumento");
 const Instrumento = require("../models/Instrumento");
+const Usuario = require("../models/Usuario");
 
 const create = async (req, res) => {
     try {
@@ -23,14 +24,18 @@ const list = async (req, res) => {
         }
         
         const instrumento = await sequelize.query(
-            "SELECT i.id, i.nome, l.limite, i.foto FROM instrumentos i " + 
-                "INNER JOIN limites l " + 
-                "ON i.id = l.instrumento_id " +
-                "WHERE l.escola_id = ?",
+            "SELECT i.id, i.nome, l.limite, i.foto, COUNT(u.id) AS qtdPessoas " + 
+                "FROM instrumentos i " + 
+                "INNER JOIN limites l ON i.id = l.instrumento_id " + 
+                "LEFT JOIN usuarios u ON i.id = u.instrumento_id " + 
+                "WHERE u.escola_id = ? GROUP BY i.id, i.nome, l.limite, i.foto",
                 {
                     replacements: [req.session.escola_id]
                 }
         );
+        instrumento[0].forEach(i => {
+            i.qtdPessoas = i.limite - i.qtdPessoas;
+        });
 
         return res.status(200).json({
             instrumento,

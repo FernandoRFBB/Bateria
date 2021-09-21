@@ -38,7 +38,7 @@ const list = async (req, res) => {
 const isLogged = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(510).json({message: "Não logado"});
+            return res.status(230).json({message: "Não logado"});
         } else {
             return res.status(200).json({message: "Logado"});
         }
