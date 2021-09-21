@@ -4,7 +4,7 @@ const Limite = require("../models/Limite");
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
 
         // Não sei pq n funciona |const limite = await Limite.findAll();
@@ -26,7 +26,7 @@ const list = async (req, res) => {
 const listOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const { instrumento_id } = req.params;
 
@@ -48,7 +48,7 @@ const listOne = async (req, res) => {
 const update = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const { instrumento_id } = req.params;
         const { limite } = req.body;

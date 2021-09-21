@@ -7,7 +7,7 @@ const path = require('path');
 const create = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
 
         const { nome, cpf, telefone,
@@ -33,7 +33,7 @@ const create = async (req, res) => {
         // renomeando o nome do arquivo padrão para o id.jpeg
         await fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
             if (error) {
-                return res.status(500).json({error: error});
+                return res.status(400).json({error: error});
             }
         })
 
@@ -57,7 +57,7 @@ const foto = async (req, res) => {
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         
         const usuarios = await Usuario.findAll({
@@ -78,7 +78,7 @@ const list = async (req, res) => {
 const listByInstrumento = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
 
         const { instrumento_id } = req.params;
@@ -101,7 +101,7 @@ const listByInstrumento = async (req, res) => {
 const listOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const { id } = req.params;
 
@@ -125,7 +125,7 @@ const listOne = async (req, res) => {
 const update = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const { id } = req.params;
         const { nome, cpf,  telefone,
@@ -168,7 +168,7 @@ const update = async (req, res) => {
                 usuario
             })
         }
-        return res.status(553).json({message: "Pessoa não existe"})
+        return res.status(400).json({message: "Pessoa não existe"})
     } catch (error) {
         return res.status(500).json({error: error.message});
     }
@@ -177,7 +177,7 @@ const update = async (req, res) => {
 const deleteOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const { id } = req.params;
 
@@ -191,14 +191,14 @@ const deleteOne = async (req, res) => {
         if (deleted) {
             await fs.unlink('./fotos/' + id + '.jpeg', (error) => {
                 if (error) {
-                    return res.status(500).json({error: error.message});
+                    return res.status(400).json({error: error.message});
                 }
             })
             return res.status(200).json({
                 message: "Deletado com sucesso"
             })
         } else {
-            return res.status(553).json({message: "Pessoa não existe"});
+            return res.status(400).json({message: "Pessoa não existe"});
         }
     } catch (error) {
         return res.status(500).json({error: error.message});

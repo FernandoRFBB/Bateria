@@ -20,7 +20,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         
         const instrumento = await sequelize.query(
@@ -48,7 +48,7 @@ const list = async (req, res) => {
 const listOne = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
 
         const { id } = req.params;
@@ -65,7 +65,7 @@ const listOne = async (req, res) => {
 const update = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
 
         const { id } = req.params;
@@ -80,7 +80,7 @@ const update = async (req, res) => {
                 instrumento
             });
         }
-        return res.status(553).json({message: "Instrumento não existe"});
+        return res.status(400).json({message: "Instrumento não existe"});
 
     } catch (error) {
         return res.status(500).json({error: error.message});

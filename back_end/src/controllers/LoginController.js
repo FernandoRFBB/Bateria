@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const create = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const { nome, email } = req.body;
         const senha = await bcrypt.hash(req.body.senha, 10);
@@ -20,7 +20,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(550).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         }
         const usuario = await Login.findAll({
             where: {
@@ -38,7 +38,7 @@ const list = async (req, res) => {
 const isLogged = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
-            return res.status(230).json({message: "Não logado"});
+            return res.status(403).json({message: "Não logado"});
         } else {
             return res.status(200).json({message: "Logado"});
         }
@@ -56,13 +56,13 @@ const auth = async (req, res) => {
             }  
         })
         if (usuario == null) {
-            return res.status(551).json({message: "Usuario inválido"});
+            return res.status(401).json({message: "Usuario inválido"});
         } else if (await bcrypt.compare(senha, usuario.senha)) {
             req.session.usuario_id = usuario.id;
             req.session.escola_id = usuario.escola_id;
             return res.status(200).json({message: "Bem vindo"})
         } else {
-            return res.status(552).json({message: "Senha inválida"})
+            return res.status(401).json({message: "Senha inválida"})
         };
     } catch (error) {
         return res.status(500).json({error: error.message});
