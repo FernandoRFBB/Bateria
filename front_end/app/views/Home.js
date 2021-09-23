@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, ScrollView, Modal, Platform } from "react-native";
+import { Text, View, ScrollView, Modal, Platform, RefreshControl } from "react-native";
 import { showMessage } from "react-native-flash-message"
-import { Formik, getIn } from 'formik'
+import { Formik } from 'formik'
 import * as yup from "yup";
 import { Button, Card, FAB, Title } from "react-native-paper";
+import { useIsFocused } from "@react-navigation/native"
+
+import message, { testarConexao } from "../services/errors"
+
 import Botao from "../components/Botao"
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from '../css/styles'
 import api from '../services/api'
@@ -24,55 +27,95 @@ export default function Home({ navigation, route }) {
 
   const [ instrumentos, setInstrumentos ] = useState([]);
   const [ mudarLimite, setMudarLimite ] = useState(false);
-  const [ objLimite, setObjLimite ] = useState(999);
 
-  const onSubmit = data => {
-    console.log(data);
-    setMudarLimite(false);
-    showMessage({
-      message: "Limite atualizado",
-      type: "success"
+  // Limite padrao do objeto para colocar no textinput
+  const [ objLimite, setObjLimite ] = useState();
+
+  // Id do instrumento, para passar para o Modal
+  const [ instrumentoLimite, setInstrumentoLimite ] = useState();
+
+  // EVITAR QUE A PESSOA ENVIE O FORMULARIO 2 VEZES OU MAIS SEGUIDOS
+  const [ disable, setDisable ] = useState(false);
+
+  // RECARREGAR A PAGINA
+  const [refreshing, setRefreshing] = useState(false);
+
+  const isFocused = useIsFocused();
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getInstrumentos();
+    setRefreshing(false);
+  })
+
+  const onSubmit = async (data) => {
+    
+    setDisable(true);
+
+    const connection = await testarConexao();
+    if (!connection) {
+      setDisable(false);
+      return;
+    }
+
+    var url = "http://34.67.164.46/api/limites/" + data.id;
+    await api.put(url, {limite: data.limite})
+    .then(() => {
+      onRefresh();
+      setMudarLimite(false);
+      showMessage({
+        message: "Limite atualizado",
+        type: "success"
+      })
     })
-    navigation.navigate("Home", { limite: true });
+    .catch(() => {
+      setMudarLimite(false);
+      message.erroDesconhecido();
+    });
+    setMudarLimite(false);
+    setDisable(false);
   }
 
   const getInstrumentos = async () => {
-    try {
-      var response = await api.get("/instrumentos");
-      
-      // COlocando 0 no final porque ele traz um array dentro de um array
+
+    const connection = await testarConexao();
+    if (!connection) {
+      setDisable(false);
+      return;
+    };
+
+    await api.get("/instrumentos")
+    .then((response) => {
+      // Colocando 0 no final porque ele traz um array dentro de um array
       setInstrumentos(response.data.instrumento[0]);
-    } catch (error) {
-      console.error(error.message)
-    }
-  }
-  
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@isLogged')
-      if(value !== null) {
-        console.log("Foi :)")
-      } else {
-        console.log("nao foi D:")
-      }
-    } catch(e) {
-      console.error(e);
-    }
+    })
+    .catch(() => {
+      message.erroDesconhecido();
+    });
   }
 
   useEffect(() => {
-    getInstrumentos();
-    getData();
-  }, []);
+    // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
+    if (isFocused) {
+      getInstrumentos();
+    }
+  }, [isFocused]);
 
   return (
     <View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         {instrumentos.map((i) =>
         <View key={i.id}>
           <Title style={{alignSelf: "center", marginTop: 10}}>{i.nome}</Title>
-          <Text style={styles.limiteText} onPress={() => {setMudarLimite(true); setObjLimite(i.id);}}>Limite: {i.limite}</Text>
-          <Text style={{alignSelf: "center", color: "red", marginBottom: 10,}}>Faltam 4 pessoas</Text>
+          <Text style={styles.limiteText} onPress={() => {setMudarLimite(true); setInstrumentoLimite(i.id); setObjLimite(i.limite);}}>Limite: {i.limite}</Text>
+          <Text style={{alignSelf: "center", color: "red", marginBottom: 10,}}>Faltam {i.qtdPessoas} pessoas</Text>
           <Card style={{ marginBottom: 20, marginHorizontal: 20}}>
             <Card.Cover source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Repique.JPG" }} />
             <Card.Actions style={{alignSelf: "center"}}>
@@ -87,7 +130,7 @@ export default function Home({ navigation, route }) {
         </View>
         )}
       </ScrollView>
-      {/* <Modal 
+      <Modal
         animationType="fade"
         transparent={true}
         visible={mudarLimite}
@@ -98,15 +141,15 @@ export default function Home({ navigation, route }) {
             <Title style={styles.limiteText}>Limite</Title>
             <View>
               <Formik
-                initialValues={{limite: '40', id: objLimite}}
+                initialValues={{limite: objLimite, id: instrumentoLimite}}
                 validationSchema={schema}
                 onSubmit={(values) => onSubmit(values)}
               >
                 {({ handleChange, handleBlur, handleSubmit, errors, values, isValid }) => (
                   <View>
                     <Input
-                      defaultValue={'40'}
-                      error={errors.sapato}
+                      defaultValue={objLimite}
+                      error={errors.limite}
                       onBlur={handleBlur("limite")}
                       onChangeText={handleChange('limite')}
                       textAlign={"center"}
@@ -116,10 +159,10 @@ export default function Home({ navigation, route }) {
                       style={[styles.boxInput, { borderColor: "black", paddingLeft: 75 }]}
                     />
                     <Botao
-                      botaoStyle={{marginTop: 10, backgroundColor: isValid ? 'black' : '#CACFD2', borderRadius: 0 }}
+                      botaoStyle={{marginTop: 10, backgroundColor: (!disable || isValid) ? 'black' : '#CACFD2', borderRadius: 0 }} // verificando se o usuario ja tiver apertado, ficar com a cor de disable
                       texto={'Enviar'}
                       onPress={handleSubmit}
-                      disabled={!isValid}                      
+                      disabled={!isValid || disable}
                     />
                   </View>
                 )}
@@ -127,12 +170,12 @@ export default function Home({ navigation, route }) {
             </View>
           </View>
         </View>
-      </Modal> */}
+      </Modal>
       <FAB
         style={styles.fab}
         icon="plus"
         onPress={() => navigation.navigate("PegarImagem",
-          { instrumento: "1", tela: "Home" })}
+          { instrumento: "", tela: "Home" })}
       />
     </View>
   );

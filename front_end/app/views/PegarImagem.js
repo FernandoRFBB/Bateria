@@ -46,7 +46,9 @@ export default function PegarImagem({ navigation, route }) {
     }
     
     const onSubmit = () => {
-        navigation.navigate("UsuarioForm", { uri: image, instrumento_id: route.params.instrumento_id, tela: route.params.tela });
+        navigation.navigate("UsuarioForm",
+          { uri: image, tela: route.params.tela, instrumento_id: route.params.instrumento_id, usuario: route.params.usuario, editar: route.params.editar });
+        // Setando todas os parametros porque não passa de uma tela pra outra sem setar os parametros
     }
 
     return (

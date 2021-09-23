@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, ScrollView, TouchableOpacity, Modal, Image, RefreshControl } from "react-native"
+import { View, Text, ScrollView, TouchableOpacity, Modal, RefreshControl } from "react-native"
 import { FAB } from "react-native-paper";
 // import Icon from "react-native-vector-icons/FontAwesome";
 import Icon from "react-native-vector-icons/Fontisto"
 import { useIsFocused } from "@react-navigation/native"
 
+import message, { testarConexao } from "../services/errors";
 import styles from "../css/styles"
 import Botao from "../components/Botao";
 import api from '../services/api'
@@ -15,20 +16,27 @@ export default function Tabela ({navigation, route}) {
   const [ usuarios, setUsuarios ] = useState([]);
 
   const getUsuarios = async () => {
-    try {
-      var response = await api.get("/usuarios/instrumento/" + route.params.instrumento_id);
-      
+
+    const connection = await testarConexao();
+    if (!connection) {
+      return;
+    };
+
+    await api.get("/usuarios/instrumento/" + route.params.instrumento_id)
+    .then((response) => {
       // Colocando 0 no final porque ele traz um array dentro de um array
       setUsuarios(response.data.usuarios);
-    } catch (error) {
-      console.log(error.message);
-    }
+    })
+    .catch((e) => {
+      console.log(e);
+      message.erroDesconhecido();
+    });   
   }
 
   const isFocused = useIsFocused();
 
   // Preciso dessa variavel pra gambiarra, quando ela atualizar, no caso quando for deletar o usuario, ele vai dar refresh na pagina automaticamente
-  const [ del, setDel ] = useState(false);
+  const [ disable, setDisable ] = useState(false);
 
   const [ deletar, setDeletar ] = useState(false); // Ativar o modal para confirmar a exclusão do usuario
   const [ deletarNome, setDeletarNome ] = useState(""); // Nome do usuario a ser deletado, para aparecer no modal
@@ -44,9 +52,8 @@ export default function Tabela ({navigation, route}) {
     setRefreshing(false);
   })
 
-
-
   useEffect(() => {
+
     // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
     if (isFocused) {
       getUsuarios();
@@ -59,7 +66,11 @@ export default function Tabela ({navigation, route}) {
   const remover = async () => {
     try {
 
-      setDel(true);
+      setDisable(true);
+      const connection = await testarConexao();
+      if (!connection) {
+        return;
+      }
 
       var url = "/usuarios/" + pressId;
       var response = await api.delete(url);
@@ -67,13 +78,13 @@ export default function Tabela ({navigation, route}) {
       showMessage({
         message: "Usuario deletado com sucesso",
         type: "danger"
-      }) 
+      });
 
       setDeletado(true);
       setDeletar(false);
       setOpen(false);
-      setDel(false);
-      onRefresh();
+      setDisable(false);
+      getUsuarios();
 
     } catch (error) {
       console.error(error)
@@ -150,13 +161,13 @@ export default function Tabela ({navigation, route}) {
                 </View>
                 <View style={styles.restoColunas}>
                   <View style={styles.col}>
-                    <Text style={styles.textoColuna}>{usuario.camisa}</Text>
+                    <Text style={styles.textoColuna}>{usuario.tam_camisa}</Text>
                   </View>
                   <View style={styles.col}>
-                    <Text style={styles.textoColuna}>{usuario.calca}</Text>
+                    <Text style={styles.textoColuna}>{usuario.tam_calca}</Text>
                   </View>
                   <View style={styles.col}>
-                    <Text style={styles.textoColuna}>{usuario.sapato}</Text>
+                    <Text style={styles.textoColuna}>{usuario.tam_calcado}</Text>
                   </View>
                 </View>
               </View>
@@ -195,8 +206,8 @@ export default function Tabela ({navigation, route}) {
         <View style={styles.paginacao}>
           <View style={styles.textoPaginacao}>
             <Text>
-              {/* Para n ficar 9 - 13 por exemplo, sendo que só tem 10 pessoas, ai fica 9 - 10 */}
-              {`${comeco + 1} - ${final < usuarios.length ? final : usuarios.length} de ${usuarios.length}`}
+              {/* Para n ficar 9 - 13 por exemplo, sendo que só tem 10 pessoas, ai fica 9 - 10 || Caso não tenha usuarios, deixar 0 - 0 de 0 */}
+              {usuarios.length > 0 ? `${comeco + 1} - ${final < usuarios.length ? final : usuarios.length} de ${usuarios.length}` : "0 - 0 de 0"}
             </Text>
           </View>
           <TouchableOpacity
@@ -236,13 +247,13 @@ export default function Tabela ({navigation, route}) {
                 botaoStyle={{ padding: 20, marginHorizontal: "25%" }}
                 texto="Voltar"
                 onPress={() => setDeletar(false)}
-                disabled={del}
+                disabled={disable}
               />
               <Botao
                 botaoStyle={{ padding: 20, marginHorizontal: "25%" }}
                 texto="Deletar"
                 onPress={remover}
-                disabled={del}
+                disabled={disable}
               />
             </View>
           </View>

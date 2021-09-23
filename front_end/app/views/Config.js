@@ -1,19 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
+import { showMessage } from "react-native-flash-message"
+
 import api from '../services/api';
-
-
+import message, { testarConexao } from "../services/errors";
 import styles from '../css/styles'
 import Botao from '../components/Botao';
 
 export default function Config({ navigation, route }) {
 
-	api.get("/login").then((response) => {
-    console.log(response.data);
-  })
+  const [ disable, setDisable ] = useState(false);
 
-	const logout = () => {
-		console.log("Logout");
+	const logout = async () => {
+
+    setDisable(true);
+
+    const connection = await testarConexao();
+    if (!connection) {
+      setDisable(false);
+      return;
+    };
+    
+    await api.get("/login/logout")
+    .then(() => {
+      showMessage({
+        message: "Saiu com sucesso",
+        type: "danger"
+      });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+    });
 	}
 
 	return (
@@ -27,6 +45,7 @@ export default function Config({ navigation, route }) {
           botaoStyle={{ marginTop: 10, marginHorizontal: "25%" }}
           texto="Sair"
           onPress={logout}
+          disabled={disable}
         />
       </View>
     )

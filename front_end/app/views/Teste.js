@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Image, Platform, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Image, Platform, TextInput, StyleSheet, Modal } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import * as yup from "yup";
 import { Formik } from "formik"
@@ -27,29 +27,33 @@ export default function UsuarioForm({ navigation, route }) {
     "Tamborim",
   ]);
 
-  // const getUsuario = async () => {
-  //   try {
-  //     var response = await api.get("/usuarios/39");
-  //     console.log("Usuario: ",response.data.usuario);
-  //     setUsuario(response.data.usuario);
-  //     setUri("http://34.67.164.46/api/usuarios/foto/44.jpeg");
-  //     console.log("nome: ",usuario.nome);
-  //     console.log("uri: ",uri)
-  //   } catch (error) {
-  //     console.log("Usuario: " + error);
-  //   }
-  // }
+    // const getUsuario = async () => {
+    //   try {
+    //     var response = await api.get("/usuarios/39");
+    //     console.log("Usuario: ",response.data.usuario);
+    //     setUsuario(response.data.usuario);
+    //     setUri("http://34.67.164.46/api/usuarios/foto/44.jpeg");
+    //     console.log("nome: ",usuario.nome);
+    //     console.log("uri: ",uri)
+    //   } catch (error) {
+    //     console.log("Usuario: " + error);
+    //   }
+    // }
 
-  // const [ usuario, setUsuario ] = useState([]);
+    // const [ usuario, setUsuario ] = useState([]);
 
-  // const [ uri, setUri ] = useState();
+    // const [ uri, setUri ] = useState();
 
-  // useEffect(() => {
-  //     getUsuario();
-  //     setUri("http://34.67.164.46/api/usuarios/foto/44.jpeg");
-  // }, []); // precisa desse array se não fica infinito carregando
+    // useEffect(() => {
+    //     getUsuario();
+    //     setUri("http://34.67.164.46/api/usuarios/foto/44.jpeg");
+    // }, []); // precisa desse array se não fica infinito carregando
 
-  // const [selectedLanguage, setSelectedLanguage] = useState();
+    // const [selectedLanguage, setSelectedLanguage] = useState();
+
+  const [ modalOpen, setModalOpen ] = useState(false);
+
+  
 
   return (
     <ScrollView>

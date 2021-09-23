@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableNativeFeedback } from 'react-native';
+import { View, Text, TextInput, ScrollView } from 'react-native';
 import * as yup from "yup";
-import { Formik } from 'formik'
+import { Formik } from 'formik';
+import { showMessage } from "react-native-flash-message"
 
-
-import styles from '../css/styles'
+import message, { testarConexao } from "../services/errors";
+import styles from '../css/styles';
 import Botao from '../components/Botao';
+import api from '../services/api';
 
 const schema = yup.object().shape({
   nome: yup.string()
@@ -19,21 +21,41 @@ const schema = yup.object().shape({
 
 export default function AdminForm({ navigation, route }) {
 
-  const [ escola_id ] = useState(2)
+  const [ disable, setDisable ] = useState(false);
 
-	const onSubmit = (data) => {
-		console.log(data);
-		showMessage({
-			message: "Administrador criado com sucesso",
-			type: "success"
-		})
-		navigation.navigate("Config", { created: true })
+	const onSubmit = async (data) => {
+
+    setDisable(true);
+    
+		const connection = testarConexao();
+		if (!connection) {
+			setDisable(false);
+			return;
+		}
+
+    await api.post("/login", {
+      nome: data.nome,
+      email: data.email,
+      senha: data.senha
+    })
+    .then(() => {
+      showMessage({
+        message: "Administrador criado com sucesso",
+        type: "success"
+      })
+    })
+    .catch((error) => {
+      console.log(error);
+      message.erroDesconhecido();
+    });
+		setDisable(false);
+		navigation.navigate("Config");
 	}
 
   return (
     <ScrollView>
       <Formik
-				initialValues={{ nome: '', email: '', senha: '', escola_id: escola_id }}
+				initialValues={{ nome: '', email: '', senha: '' }}
 				validationSchema={schema}
 				onSubmit={(values) => onSubmit(values)}
 			>
@@ -111,10 +133,10 @@ export default function AdminForm({ navigation, route }) {
 						</View>
 						<View>
               <Botao
-			  	      botaoStyle={{ backgroundColor: isValid ? "black" : "#CACFD2" }}
+			  	      botaoStyle={{ backgroundColor: !disable ? "black" : "#CACFD2" }}
                 texto="Cadastrar"
                 onPress={handleSubmit}
-                disabled={!isValid}
+                disabled={!isValid || disable}
               />
 						</View>
 					</View>
