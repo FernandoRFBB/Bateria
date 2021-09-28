@@ -26,17 +26,18 @@ const create = async (req, res) => {
             instrumento_id,
         });
 
-        // colocando o campo foto como o id.jpeg
-        usuario.foto = usuario.id + ".jpeg"
-        await usuario.save();
+        if (req.file) {
+            // colocando o campo foto como o id.jpeg
+            usuario.foto = usuario.id + ".jpeg"
+            await usuario.save();
 
-        // renomeando o nome do arquivo padrão para o id.jpeg
-        await fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
-            if (error) {
-                return res.status(400).json({error: error});
-            }
-        })
-
+            // renomeando o nome do arquivo padrão para o id.jpeg
+            await fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
+                if (error) {
+                    return res.status(400).json({error: error});
+                }
+            	})
+        }
         return res.status(200).json({
             usuario,
         });
@@ -154,7 +155,11 @@ const update = async (req, res) => {
             ]}
         });
         
-        if (req.file) {
+        if (req.file && usuario != 0) {
+            
+            usuario.foto = usuario.id + ".jpeg";
+            await usuario.save();
+
             // renomeando o nome do arquivo padrão para o id.jpeg
             await fs.rename('./fotos/' + req.file.filename, './fotos/' + usuario.id + '.jpeg', (error) => {
                 if (error) {
@@ -181,6 +186,12 @@ const deleteOne = async (req, res) => {
         }
         const { id } = req.params;
 
+        const usuario = await Usuario.findOne({
+            where: {[Op.and]: [
+                { id: id }, { escola_id: req.session.escola_id }
+            ]}
+        });
+
         const deleted = await Usuario.destroy({
             where: {[Op.and]: [
                 { id: id }, { escola_id: req.session.escola_id }
@@ -189,11 +200,14 @@ const deleteOne = async (req, res) => {
 
         // Se realmente existir um usuario desse na escola, tirar a foto. PRevenindo excluir a foto;
         if (deleted) {
-            await fs.unlink('./fotos/' + id + '.jpeg', (error) => {
-                if (error) {
-                    return res.status(400).json({error: error.message});
-                }
-            })
+            if (usuario.foto == null) {
+                await fs.unlink('./fotos/' + id + '.jpeg', (error) => {
+                    if (error) {
+                        return res.status(400).json({error: error.message});
+                    }
+                })
+            }
+           
             return res.status(200).json({
                 message: "Deletado com sucesso"
             })

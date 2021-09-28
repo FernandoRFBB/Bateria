@@ -112,23 +112,53 @@ const tamanhos = async (req, res) => {
         if (req.session.usuario_id == null) {
             return res.status(550).json({message: "Não logado"});
         }
-        const camisa = await Usuario.findAll({
-            attributes: ["tam_camisa", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: req.session.escola_id },
-            group: ["tam_camisa"],
-        })
-        const calca = await Usuario.findAll({
-            attributes: ["tam_calca", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
-            where: { escola_id: req.session.escola_id },
-            group: ["tam_calca"],
-        })
+
+        const camisa = await sequelize.query(
+            "SELECT COUNT(id) AS qtd, tam_camisa " +
+            "FROM usuarios " +
+            "WHERE escola_id = ? " +
+            "GROUP BY tam_camisa " +
+            "ORDER BY CASE tam_camisa " +
+                "WHEN 'PP' THEN 0 " +
+                "WHEN 'P' THEN 1 " +
+                "WHEN 'M' THEN 2 " +
+                "WHEN 'G' THEN 3 " +
+                "WHEN 'GG' THEN 4 " +
+                "WHEN 'XG' THEN 5 " +
+                "ELSE 9999 " +
+                "END",
+                {
+                    replacements: [req.session.escola_id]
+                }
+        );
+
+        const calca = await sequelize.query(
+            "SELECT COUNT(id) AS qtd, tam_calca " +
+            "FROM usuarios " +
+            "WHERE escola_id = ? " +
+            "GROUP BY tam_calca " +
+            "ORDER BY CASE tam_calca " +
+                "WHEN 'PP' THEN 0 " +
+                "WHEN 'P' THEN 1 " +
+                "WHEN 'M' THEN 2 " +
+                "WHEN 'G' THEN 3 " +
+                "WHEN 'GG' THEN 4 " +
+                "WHEN 'XG' THEN 5 " +
+                "ELSE 9999 " +
+                "END",
+                {
+                    replacements: [req.session.escola_id]
+                }
+        );
+
         const calcado = await Usuario.findAll({
             attributes: ["tam_calcado", [sequelize.fn("count", sequelize.col("id")), "qtd"]],
             where: { escola_id: req.session.escola_id },
-            group: ["tam_calcado"],
+            group: ["tam_calcado"]
         })
+
         return res.status(200).json({ 
-            camisa, calca, calcado
+            camisa: camisa[0], calca: calca[0], calcado
         })
     } catch (error) {
         return res.status(500).json({error: error.message});
