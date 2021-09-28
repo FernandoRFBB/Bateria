@@ -26,14 +26,16 @@ const list = async (req, res) => {
         const instrumento = await sequelize.query(
             "SELECT i.id, i.nome, l.limite, i.foto, COUNT(u.id) AS qtdPessoas " + 
                 "FROM instrumentos i " + 
-                "INNER JOIN limites l ON i.id = l.instrumento_id " + 
-                "LEFT JOIN usuarios u ON i.id = u.instrumento_id " + 
-                "WHERE u.escola_id = ? GROUP BY i.id, i.nome, l.limite, i.foto",
+                "LEFT JOIN limites l ON i.id = l.instrumento_id " + 
+                "LEFT JOIN (SELECT * FROM usuarios WHERE escola_id = ?) u ON i.id = u.instrumento_id " + 
+                "GROUP BY i.id, i.nome, l.limite, i.foto " +
+                "ORDER BY i.nome",
                 {
                     replacements: [req.session.escola_id]
                 }
         );
         instrumento[0].forEach(i => {
+            // o QTD PESSOAS que vem do SELECT, sao a quantidade de pessoas naquele instrumento, e aqui eu transformo em quantas pessoas faltam para estar no limite maximo
             i.qtdPessoas = i.limite - i.qtdPessoas;
         });
 
