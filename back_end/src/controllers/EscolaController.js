@@ -27,6 +27,8 @@ const create = async (req, res) => {
         //     var test = instrumento(i);
         //     console.log(test.dataValues.id);
         // }
+        
+        req.session.escola_id = escola.id;
 
         return res.status(200).json({
             escola, limites
