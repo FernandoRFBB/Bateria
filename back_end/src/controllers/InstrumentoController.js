@@ -26,12 +26,12 @@ const list = async (req, res) => {
         const instrumento = await sequelize.query(
             "SELECT i.id, i.nome, l.limite, i.foto, COUNT(u.id) AS qtdPessoas " + 
                 "FROM instrumentos i " + 
-                "LEFT JOIN limites l ON i.id = l.instrumento_id " + 
+                "LEFT JOIN (SELECT * FROM limites WHERE escola_id = ?) l ON i.id = l.instrumento_id " + 
                 "LEFT JOIN (SELECT * FROM usuarios WHERE escola_id = ?) u ON i.id = u.instrumento_id " + 
                 "GROUP BY i.id, i.nome, l.limite, i.foto " +
                 "ORDER BY i.nome",
                 {
-                    replacements: [req.session.escola_id]
+                    replacements: [req.session.escola_id, req.session.escola_id]
                 }
         );
         instrumento[0].forEach(i => {
