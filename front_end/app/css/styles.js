@@ -9,7 +9,7 @@ export default StyleSheet.create({
         marginBottom: 20,
         marginHorizontal: 50
       },
-      border: {
+      topView: {
         borderBottomWidth: 1,
         borderBottomColor: "gray",
         flex: 1,
@@ -200,8 +200,10 @@ export default StyleSheet.create({
         padding: 16,
         marginHorizontal: 20,
         marginTop: 2,
-        marginBottom: 8,
+        // marginBottom: 8,
         fontSize: 16,
+        paddingRight: 0,
+        marginRight: 0,
       },
       errorMessage: {
         color: "red",
@@ -254,4 +256,49 @@ export default StyleSheet.create({
         marginHorizontal: "5%",
         paddingRight: 30, // to ensure the text is never behind the icon
       },
+      tamLinha: {
+        flex: 1,
+        flexDirection: 'row',
+        maxHeight: 20,
+      },
+      tamTexto: {
+        width: 20,
+      },
+      qtdTexto: {
+        marginLeft: 25,
+      },
+      formTexto: {
+        fontSize: 20
+      },
+      formView: {
+        marginLeft: 32,
+        marginBottom: 5
+      },
+      formInput: {
+        borderColor: "gray",
+        borderWidth: 0.5,
+        borderRadius: 10,
+        padding: 16,
+        fontSize: 16,
+        paddingRight: 0,
+        marginRight: 0,
+        flex: 1,
+        borderWidth: 0
+      },
+      formInputView: {
+        flex: 1,
+        flexDirection: "row",
+        minHeight: 60,
+        justifyContent: "center",
+        marginBottom: 30,
+        borderWidth: 1,
+        borderColor: "black",
+        marginHorizontal: 20,
+        borderRadius: 10
+      },
+      iconSenha: {
+        alignSelf: 'center',
+        marginHorizontal: 20,
+        marginTop: 20
+      }
 })

@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import FlashMessage from "react-native-flash-message";
 import Icon from "react-native-vector-icons/Ionicons";
-import { TouchableOpacity, Platform } from 'react-native';
+import { TouchableOpacity, Platform, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Home from "./app/views/Home";
@@ -16,9 +16,7 @@ import Config from "./app/views/Config";
 import AdminForm from "./app/views/AdminForm";
 import Teste from "./app/views/Teste";
 import Loading from "./app/views/Loading";
-
-import api from "./app/services/api";
-import { validateYupSchema } from 'formik';
+import EscolaForm from "./app/views/EscolaForm";
 
 const Stack = createStackNavigator();
  
@@ -28,7 +26,17 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Loading" component={Loading} options={{title: false}} />
-        <Stack.Screen name="Login" component={Login} options={{title: "Login"}} />
+        <Stack.Screen name="Login" component={Login} options={({ navigation }) => ({
+          title: "Login",
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("EscolaForm")}
+              style={{padding: 20}}
+            >
+              <Text>Criar Escola</Text>
+            </TouchableOpacity>
+          )
+        })} />
         <Stack.Screen name="Home" component={Home} options={({ navigation }) => ({
           title: false,
           headerRight: () => (
@@ -60,7 +68,7 @@ export default function App() {
         <Stack.Screen name="Quantidade" component={Quantidade} options={{title: "Fantasias"}} />
         <Stack.Screen name="Config" component={Config} options={{title: "Configurações"}} />
         <Stack.Screen name="AdminForm" component={AdminForm} options={{title: "Adicionar admin"}} />
-        <Stack.Screen name="Teste" component={Teste} options={{title: "TESTE"}} />
+        <Stack.Screen name="EscolaForm" component={EscolaForm} options={{title: "Criar escola"}} />
       </Stack.Navigator>
       <FlashMessage position="top" />
     </NavigationContainer>

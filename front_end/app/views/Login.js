@@ -3,12 +3,14 @@ import { View, StyleSheet, Text, TextInput, TouchableNativeFeedbackBase } from '
 import * as yup from 'yup'
 import { Formik } from 'formik'
 import { showMessage } from "react-native-flash-message"
+import Icon from "react-native-vector-icons/Ionicons";
 
 import message, { testarConexao } from "../services/errors"
 
 import styles from '../css/styles'
 import Botao from '../components/Botao'
 import api from '../services/api'
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const schema = yup.object().shape({
   	email: yup.string()
@@ -22,6 +24,8 @@ export default function Login({navigation, route}) {
 
   // EVITAR QUE A PESSOA ENVIE O FORMULARIO 2 VEZES OU MAIS SEGUIDOS
   const [ disable, setDisable ] = useState(false);
+
+  const [ esconderSenha, setEsconderSenha ] = useState(true);
 
 	const onSubmit = async (data) => {
       setDisable(true);
@@ -72,7 +76,7 @@ export default function Login({navigation, route}) {
       >
         {({ handleChange, handleBlur, handleSubmit, errors, values, isValid, touched }) => (
           <View>
-            <View style={{flex: 1, alignItems: 'center', marginTop: 20, maxHeight: 13, minHeight: 13}}>
+            <View style={{flex: 1, alignItems: 'center', marginTop: 20, minHeight: 15, marginBottom: 80}}>
               {errors.email && touched.email && (
                 <Text style={styles.errorMessage}>{errors.email}</Text>
               )}
@@ -80,47 +84,51 @@ export default function Login({navigation, route}) {
                 <Text style={styles.errorMessage}>{errors.senha}</Text>
               )}
             </View>
-            <View style={{marginTop: 80}}>
-              <View style={{marginBottom: 20}}>
-                <View style={{marginLeft: 32, marginBottom: 5}}>
-                  <Text
-                    style={{fontSize: 20}}
-                  >
-                    Email
-                  </Text>
-                </View>
-                <View>
-                  <TextInput
-                    onChangeText={handleChange("email")}
-                    onBlur={handleBlur("email")}
-                    value={values.email}
-                    placeholder="Email"
-                    maxLength={40}
-                    style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
-                    autoCapitalize="none"
-                    autoCompleteType="email"
-                  />
-                </View>
+            <View style={styles.formView}>
+              <Text
+                style={styles.formTexto}
+              >
+                Email
+              </Text>
             </View>
-            <View style={{marginBottom: 15}}>
-              <View style={{marginLeft: 32, marginBottom: 4}}>
-                <Text
-                  style={{fontSize: 20}}
-                >
-                  Senha
-                </Text>
-              </View>
-              <View>
-                <TextInput
-                  onChangeText={handleChange("senha")}
-                  onBlur={handleBlur("senha")}
-                  value={values.senha}
-                  placeholder="Senha"
-                  maxLength={40}
-                  style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
-                  secureTextEntry={true}
+            <View style={styles.formInputView}>
+              <TextInput
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                value={values.email}
+                placeholder="Email"
+                maxLength={40}
+                style={styles.formInput}
+                autoCapitalize="none"
+                autoCompleteType="email"
+                autoCorrect={false}
+                keyboardType="email-address"
+              />
+            </View>
+            <View style={styles.formView}>
+              <Text
+                style={styles.formTexto}
+              >
+                Senha
+              </Text>
+            </View>
+            <View style={styles.formInputView}>
+              <TextInput
+                onChangeText={handleChange("senha")}
+                onBlur={handleBlur("senha")}
+                value={values.senha}
+                placeholder="Senha"
+                maxLength={40}
+                style={styles.formInput}
+                secureTextEntry={esconderSenha}
+              />
+              <TouchableOpacity onPress={() => setEsconderSenha(!esconderSenha)}>
+                <Icon
+                  name={esconderSenha ? "eye-off" : "eye"}
+                  style={styles.iconSenha}
+                  size={20}
                 />
-              </View>
+              </TouchableOpacity>
             </View>
             <View style={{ marginTop: 20 }}>
               <Botao
@@ -131,7 +139,6 @@ export default function Login({navigation, route}) {
                 disabled={!isValid || disable}
               />
             </View>
-          </View>
          </View>
        )}
      </Formik>

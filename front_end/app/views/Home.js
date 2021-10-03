@@ -88,6 +88,7 @@ export default function Home({ navigation, route }) {
     .then((response) => {
       // Colocando 0 no final porque ele traz um array dentro de um array
       setInstrumentos(response.data.instrumento[0]);
+      console.log(response.data.instrumento);
     })
     .catch(() => {
       message.erroDesconhecido();

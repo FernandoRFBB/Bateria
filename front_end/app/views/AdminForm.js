@@ -3,6 +3,7 @@ import { View, Text, TextInput, ScrollView } from 'react-native';
 import * as yup from "yup";
 import { Formik } from 'formik';
 import { showMessage } from "react-native-flash-message"
+import Icon from "react-native-vector-icons/Ionicons";
 
 import message, { testarConexao } from "../services/errors";
 import styles from '../css/styles';
@@ -25,31 +26,40 @@ export default function AdminForm({ navigation, route }) {
 
 	const onSubmit = async (data) => {
 
-    setDisable(true);
-    
+		setDisable(true);
+		
 		const connection = testarConexao();
 		if (!connection) {
 			setDisable(false);
 			return;
 		}
 
-    await api.post("/login", {
-      nome: data.nome,
-      email: data.email,
-      senha: data.senha
-    })
-    .then(() => {
-      showMessage({
-        message: "Administrador criado com sucesso",
-        type: "success"
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-      message.erroDesconhecido();
-    });
-		setDisable(false);
-		navigation.navigate("Config");
+		await api.post("/login", {
+			nome: data.nome,
+			email: data.email,
+			senha: data.senha
+		})
+		.then(() => {
+			showMessage({
+				message: "Administrador criado com sucesso",
+				type: "success"
+			})
+
+      // Se tiver acabado de criar a escola, vai pra home, se n volta pra config
+      if (route.params.criando_escola) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
+      } else {
+        navigation.navigate("Config");
+      }
+		})
+		.catch((error) => {
+			console.log(error);
+			message.erroDesconhecido();
+			setDisable(false);
+		});
 	}
 
   return (
@@ -102,11 +112,14 @@ export default function AdminForm({ navigation, route }) {
 							<View>
 								<TextInput
 									onChangeText={handleChange("email")}
-									onBlur={handleBlur("email")}
-									value={values.email}
-									placeholder="Email"
-									maxLength={40}
-									style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
+                  onBlur={handleBlur("email")}
+                  value={values.email}
+                  placeholder="Email"
+                  maxLength={40}
+                  style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
+                  autoCapitalize="none"
+                  autoCompleteType="email"
+                  autoCorrect={false}
                   keyboardType="email-address"
 								/>
 							</View>
@@ -129,6 +142,10 @@ export default function AdminForm({ navigation, route }) {
 									style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
 									secureTextEntry={true}
 								/>
+                <Icon
+                  name="eye-off"
+                  size={20}
+                />
 							</View>
 						</View>
 						<View>
