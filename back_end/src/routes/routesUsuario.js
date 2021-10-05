@@ -35,6 +35,7 @@ let upload = multer({
 routes.get("/", UsuarioController.list);
 routes.get("/:id", UsuarioController.listOne);
 routes.get("/instrumento/:instrumento_id", UsuarioController.listByInstrumento);
+routes.get("/foto/padrao", UsuarioController.fotoPadrao);
 routes.get("/foto/:id", UsuarioController.foto);
 routes.put("/:id", upload.single("foto"), UsuarioController.update);
 routes.post("/", upload.single("foto"), UsuarioController.create);

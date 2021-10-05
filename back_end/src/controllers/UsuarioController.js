@@ -55,6 +55,14 @@ const foto = async (req, res) => {
     }
 }
 
+const fotoPadrao = async (req, res) => {
+    try {
+        return res.status(200).sendFile(path.resolve(__dirname, "..", "config", "fotos", "usuario.png"));
+    } catch (error) {
+        return res.status(500).json({error: error.message})
+    }
+}
+
 const list = async (req, res) => {
     try {
         if (req.session.usuario_id == null) {
@@ -228,5 +236,6 @@ module.exports = {
     listOne,
     update,
     deleteOne,
+    fotoPadrao,
     listByInstrumento,
 }

@@ -10,7 +10,7 @@ npm-debug.*
 web-build/
 .env
 service.js
-fotos/
+/fotos/
 yarn.lock
 package-lock.json
 
