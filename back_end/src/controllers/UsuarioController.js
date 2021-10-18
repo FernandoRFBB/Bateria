@@ -23,7 +23,7 @@ const create = async (req, res) => {
 
     // Verificando se o CPF ja existe
     if (cpfExists) {
-      return res.status(409).json({message: "CPF já existe"});
+      return res.status(409).json({message: "CPF já está cadastrado"});
     }
 
     const usuario = await Usuario.create({
@@ -151,7 +151,17 @@ const update = async (req, res) => {
         tam_camisa, tam_calca,
         tam_calcado, diretor,
         instrumento_id } = req.body;
+    
+    var usuario = await Usuario.findOne({
+      where: {[Op.and]: [
+        { cpf: cpf }, { escola_id: req.session.escola_id }
+      ]}
+    });
 
+    if (usuario) {
+      return res.status(409).json({message: "CPF já está cadastrado"})
+    }
+    
     await Usuario.update({
       nome,
       cpf,
@@ -167,7 +177,7 @@ const update = async (req, res) => {
       ]}
     });
 
-    const usuario = await Usuario.findOne({
+    var usuario = await Usuario.findOne({
       where: {[Op.and]: [
         { id: id }, { escola_id: req.session.escola_id }
       ]}
