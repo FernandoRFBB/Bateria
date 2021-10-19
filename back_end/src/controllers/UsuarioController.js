@@ -68,7 +68,7 @@ const foto = async (req, res) => {
 
 const fotoPadrao = async (req, res) => {
   try {
-    return res.status(200).sendFile(path.resolve(__dirname, "..", "config", "fotos", "usuario.png"));
+    return res.status(200).sendFile(path.resolve(__dirname, "..", "assets", "usuario.png"));
   } catch (error) {
     return res.status(500).json({error: error.message})
   }
@@ -152,13 +152,13 @@ const update = async (req, res) => {
         tam_calcado, diretor,
         instrumento_id } = req.body;
     
-    var usuario = await Usuario.findOne({
+    var usuario = await Usuario.findAll({
       where: {[Op.and]: [
         { cpf: cpf }, { escola_id: req.session.escola_id }
       ]}
     });
 
-    if (usuario) {
+    if (usuario.length > 0 && usuario[0].id != id) {
       return res.status(409).json({message: "CPF já está cadastrado"})
     }
     
@@ -224,8 +224,6 @@ const deleteOne = async (req, res) => {
         { id: id }, { escola_id: req.session.escola_id }
       ]}
     });
-
-    console.log(usuario)
 
     // Se realmente existir um usuario desse na escola, tirar a foto. PRevenindo excluir a foto;
     if (deleted) {
