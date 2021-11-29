@@ -3,7 +3,7 @@ import { View } from "react-native"
 
 import api from '../services/api';
 
-export default function Loading ({navigation, route}) {
+export default function Init ({navigation, route}) {
 
 	useEffect(() => {
 		isLogged();

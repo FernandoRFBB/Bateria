@@ -7,13 +7,66 @@ import { useIsFocused } from "@react-navigation/native"
 
 import message, { testarConexao } from "../services/errors";
 import styles from "../css/styles"
-import Botao from "../components/Botao";
 import api from '../services/api'
 import { showMessage } from "react-native-flash-message";
 
 export default function Tabela ({navigation, route}) {
 
+  const isFocused = useIsFocused();
+
   const [ usuarios, setUsuarios ] = useState([]);
+
+  // Preciso dessa variavel pra gambiarra, quando ela atualizar, no caso quando for deletar o usuario, ele vai dar refresh na pagina automaticamente
+  const [ disable, setDisable ] = useState(false);
+
+  // Ativar o modal para confirmar a exclusão do usuario
+  const [ deletar, setDeletar ] = useState(false);
+
+  // Nome do usuario a ser deletado, para aparecer no modal
+  const [ deletarNome, setDeletarNome ] = useState("");
+
+  // RECARREGAR A PAGINA 
+  const [refreshing, setRefreshing] = useState(false);
+
+  // SOBRE AS PAGINAS E TROCAR ELAS
+    // Quantos itens aparecem por pagina || Meu medo desse método é ter que carregar muito usuario de uma vez, desencessariamente.
+    const [ qtdPorPagina, setQtdPorPagina ] = useState(10);
+
+    // Pagina atual
+    const [ pagina, setPagina ] = useState(0);
+    const [ ordemDecrescente, setOrdemDecrescente ] = useState(false);
+
+    // Se esta aberto as opcoes do usuario
+    const [ open, setOpen ] = useState(false);
+
+    // Usuario selecionado
+    const [ pressId, setPressId ] = useState(0);
+
+    // Ordenar os usuarios
+    const usuariosOrdenados = usuarios
+      .slice()
+      .sort((item1, item2) =>
+        (ordemDecrescente ? item1.nome < item2.nome : item2.nome < item1.nome)
+          ? 1
+          : -1
+      );
+
+    // Seta o numero do primeiro item da lista naquela pagina
+    const comeco = pagina * qtdPorPagina;
+    const final = ( pagina + 1 ) * qtdPorPagina;
+
+  // const [ deletado, setDeletado ] = useState(false);
+
+  useEffect(() => {
+    // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
+    if (isFocused) {
+      getUsuarios();
+      getNomeInstrumento();
+    }
+    return () => {
+      setUsuarios([]);
+    }
+  }, [isFocused]);
 
   const getUsuarios = async () => {
 
@@ -33,35 +86,19 @@ export default function Tabela ({navigation, route}) {
     });   
   }
 
-  const isFocused = useIsFocused();
-
-  // Preciso dessa variavel pra gambiarra, quando ela atualizar, no caso quando for deletar o usuario, ele vai dar refresh na pagina automaticamente
-  const [ disable, setDisable ] = useState(false);
-
-  const [ deletar, setDeletar ] = useState(false); // Ativar o modal para confirmar a exclusão do usuario
-  const [ deletarNome, setDeletarNome ] = useState(""); // Nome do usuario a ser deletado, para aparecer no modal
-  const [ deletado, setDeletado ] = useState(false);
-
-  // RECARREGAR A PAGINA
-  
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    getUsuarios();
-    setRefreshing(false);
-  })
-
-  useEffect(() => {
-
-    // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
-    if (isFocused) {
-      getUsuarios();
+  const getNomeInstrumento = async () => {
+    try {
+      const connection = await testarConexao();
+      if (!connection) {
+        return;
+      }
+      var url = "/instrumentos/" + route.params.instrumento_id;
+      var response = await api.get(url);
+      navigation.setOptions({ title: response.data.instrumento.nome});
+    } catch (e) {
+      message.erroDesconhecido();
     }
-    return () => {
-      setUsuarios([]);
-    }
-  }, [isFocused]);
+  }
 
   const remover = async () => {
     try {
@@ -73,41 +110,28 @@ export default function Tabela ({navigation, route}) {
       }
 
       var url = "/usuarios/" + pressId;
-      var response = await api.delete(url);
-      console.log(response);
+      await api.delete(url);
       showMessage({
         message: "Usuario deletado com sucesso",
         type: "danger"
       });
 
-      setDeletado(true);
+      // setDeletado(true);
       setDeletar(false);
       setOpen(false);
-      setDisable(false);
       getUsuarios();
 
-    } catch (error) {
-      console.error(error)
+    } catch (e) {
+      message.erroDesconhecido();
     }
+    setDisable(false);
   }
 
-  // Quantos itens aparecem por pagina || Meu medo desse método é ter que carregar muito usuario de uma vez, desencessariamente.
-  const [ qtdPorPagina, setQtdPorPagina ] = useState(4);
-  const [ pagina, setPagina ] = useState(0);
-  const [ ordemDecrescente, setOrdemDecrescente ] = useState(false);
-  const [ open, setOpen ] = useState(false);
-  const [ pressId, setPressId ] = useState(0);
-  const usuariosOrdenados = usuarios
-    .slice()
-    .sort((item1, item2) =>
-      (ordemDecrescente ? item1.nome < item2.nome : item2.nome < item1.nome)
-        ? 1
-        : -1
-    );
-  // Seta o numero do primeiro item da lista naquela pagina
-  const comeco = pagina * qtdPorPagina;
-  const final = ( pagina + 1 ) * qtdPorPagina;
-
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getUsuarios();
+    setRefreshing(false);
+  })
 
   return(
     <View style={{flex: 1}}>
@@ -130,6 +154,9 @@ export default function Tabela ({navigation, route}) {
             </TouchableOpacity>
           </View>
           <View style={styles.restoColunas}>
+            <View style={styles.col}>
+              <Text style={styles.textoTituloColuna}>D</Text>
+            </View>
             <View style={styles.col}>
               <Text style={styles.textoTituloColuna}>Camisa</Text>
             </View>
@@ -161,6 +188,11 @@ export default function Tabela ({navigation, route}) {
                 </View>
                 <View style={styles.restoColunas}>
                   <View style={styles.col}>
+                    {usuario.diretor != 0 && (
+                      <Icon style={styles.textoColuna} name={"check"}/>
+                    )}
+                  </View>
+                  <View style={styles.col}>
                     <Text style={styles.textoColuna}>{usuario.tam_camisa}</Text>
                   </View>
                   <View style={styles.col}>
@@ -176,7 +208,7 @@ export default function Tabela ({navigation, route}) {
             <View
               style={styles.tabelaOp}>
               <View>
-                <TouchableOpacity onPress={() => navigation.navigate("UsuarioForm", { usuario: pressId, tela: "Tabela", ver: true })}>
+                <TouchableOpacity onPress={() => navigation.navigate("UsuarioForm", { usuario: pressId, tela: "Tabela", ver: true, instrumentos: route.params.instrumentos })}>
                   <Icon
                     name="preview"
                     size={30}
@@ -184,7 +216,7 @@ export default function Tabela ({navigation, route}) {
                 </TouchableOpacity>
               </View>
               <View>
-                <TouchableOpacity onPress={() => navigation.navigate("UsuarioForm", { usuario: pressId, tela: "Tabela", editar: true})}>
+                <TouchableOpacity onPress={() => navigation.navigate("UsuarioForm", { usuario: pressId, tela: "Tabela", editar: true, instrumentos: route.params.instrumentos})}>
                   <Icon
                     name="save-1"
                     size={30}
@@ -237,25 +269,19 @@ export default function Tabela ({navigation, route}) {
         animationType="fade"
         transparent={true}
         visible={deletar}
-        onRequestClose={() => {setDeletar(false)}}
+        onRequestClose={() => setDeletar(false)}
       >
-        <View style={styles.centerView}>
-          <View style={[styles.modalView, { flex: 1, maxHeight: 250, justifyContent: 'center', maxWidth: 300 }]}>
-            <Text>Tem certeza que deseja deletar {deletarNome}?</Text>
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 30}}>
-              <Botao
-                botaoStyle={{ padding: 20, marginHorizontal: "25%" }}
-                texto="Voltar"
-                onPress={() => setDeletar(false)}
-                disabled={disable}
-              />
-              <Botao
-                botaoStyle={{ padding: 20, marginHorizontal: "25%" }}
-                texto="Deletar"
-                onPress={remover}
-                disabled={disable}
-              />
-            </View>
+        <View style={[styles.modalView, { marginTop: "70%" }]}>
+          <View style={{alignContent: 'center'}}>
+            <Text style={{fontSize: 18, textAlign: 'center'}}>Tem certeza que deseja deletar {deletarNome}?</Text>
+          </View>
+          <View style={styles.deletarView}>
+            <TouchableOpacity style={styles.deletarBotao} onPress={() => setDeletar(false)}>
+              <Text style={styles.limiteBotaoTexto}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.deletarBotao, { backgroundColor: !disable ? 'black' : '#CACFD2' }]} onPress={remover} disabled={disable}>
+              <Text style={styles.limiteBotaoTexto}>Deletar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -263,7 +289,7 @@ export default function Tabela ({navigation, route}) {
         style={styles.fab}
         icon="plus"
         onPress={() => navigation.navigate("PegarImagem",
-          { instrumento_id: route.params.instrumento_id, tela: "Tabela" })}
+          { instrumento_id: route.params.instrumento_id, tela: "Tabela", instrumentos: route.params.instrumentos })}
       />
     </View> 
   )

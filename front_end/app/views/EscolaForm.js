@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import * as yup from "yup";
 import { Formik } from 'formik';
 import { showMessage } from "react-native-flash-message"
 
 import message, { testarConexao } from "../services/errors";
 import styles from '../css/styles';
-import Botao from '../components/Botao';
 import api from '../services/api';
 
 const schema = yup.object().shape({
-  escola: yup.string()
+  nome: yup.string()
         .required("Nome é obrigatório"),
 })
 
@@ -29,7 +28,7 @@ export default function EscolaForm({ navigation, route }) {
 		}
 
 		await api.post("/escolas", {
-			nome: data.escola
+			nome: data.nome
 		})
 		.then(() => {
 			showMessage({
@@ -41,45 +40,49 @@ export default function EscolaForm({ navigation, route }) {
 		.catch((error) => {
 			console.log(error);
 			message.erroDesconhecido();
-			setDisable(false);
 		});
+    setDisable(false);
 	}
 
   return (
     <ScrollView>
       <Formik
-				initialValues={{ escola: '' }}
+				initialValues={{ nome: '' }}
 				validationSchema={schema}
 				onSubmit={(values) => onSubmit(values)}
 			>
-				{({ handleChange, handleBlur, handleSubmit, values, isValid }) => (				
-					<View style={{marginTop: 10}}>
-						<View style={{marginBottom: 40}}>
-							<View style={{marginLeft: 35, marginBottom: 4}}>
-								<Text
-									style={{fontSize: 18}}
-								>
-									Nome da Escola
-								</Text>
-							</View>
-							<View>
-								<TextInput
-									onChangeText={handleChange("escola")}
-									onBlur={handleBlur("escola")}
-									value={values.escola}
-									placeholder="Nome da Escola"
-									maxLength={40}
-									style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
-								/>
-							</View>
-						</View>
-						<View>
-              <Botao
-			  	      botaoStyle={{ backgroundColor: !disable ? "black" : "#CACFD2" }}
-                texto="Criar"
-                onPress={handleSubmit}
-                disabled={!isValid || disable}
+				{({ handleChange, handleBlur, handleSubmit, values, errors }) => (				
+					<View style={{marginTop: "50%"}}>
+            <View>
+              { errors.nome && (
+                <Text style={styles.errorMessage}>{errors.nome}</Text>
+              )}
+            </View>
+						<View style={styles.formView}>
+              <Text
+                style={styles.formTexto}
+              >
+                Nome
+              </Text>
+            </View>
+            <View style={styles.formInputView}>
+              <TextInput
+                onChangeText={handleChange("nome")}
+                onBlur={handleBlur("nome")}
+                value={values.nome}
+                placeholder="Nome"
+                maxLength={40}
+                style={styles.formInput}
               />
+            </View>
+						<View>
+              <TouchableOpacity
+			  	      style={[styles.botao, { backgroundColor: !disable ? "black" : "#CACFD2" }]}
+                onPress={handleSubmit}
+                disabled={disable}
+              >
+                <Text style={styles.botaoTexto}>Criar</Text>
+              </TouchableOpacity>
 						</View>
 					</View>
 				)}

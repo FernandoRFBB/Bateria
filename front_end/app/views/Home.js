@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, ScrollView, Modal, Platform, RefreshControl } from "react-native";
+import { Text, TextInput, View, ScrollView, Modal, Platform, RefreshControl, TouchableOpacity } from "react-native";
 import { showMessage } from "react-native-flash-message"
 import { Formik } from 'formik'
 import * as yup from "yup";
@@ -7,13 +7,9 @@ import { Button, Card, FAB, Title } from "react-native-paper";
 import { useIsFocused } from "@react-navigation/native"
 
 import message, { testarConexao } from "../services/errors"
-
-import Botao from "../components/Botao"
-
-
 import styles from '../css/styles'
 import api from '../services/api'
-import Input from "../components/Input"
+import Loading from '../components/Loading';
 
 const schema = yup.object().shape({
     limite: yup.number()
@@ -41,6 +37,13 @@ export default function Home({ navigation, route }) {
   const [refreshing, setRefreshing] = useState(false);
 
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
+    if (isFocused) {
+      getInstrumentos();
+    }
+  }, [isFocused]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -80,7 +83,6 @@ export default function Home({ navigation, route }) {
 
     const connection = await testarConexao();
     if (!connection) {
-      setDisable(false);
       return;
     };
 
@@ -88,22 +90,15 @@ export default function Home({ navigation, route }) {
     .then((response) => {
       // Colocando 0 no final porque ele traz um array dentro de um array
       setInstrumentos(response.data.instrumento[0]);
-      console.log(response.data.instrumento);
     })
     .catch(() => {
       message.erroDesconhecido();
     });
   }
 
-  useEffect(() => {
-    // Usando if isFocused porque se não ele vai carregar a pagina também quando eu sair dela
-    if (isFocused) {
-      getInstrumentos();
-    }
-  }, [isFocused]);
-
   return (
     <View>
+      <Loading loading={disable}/>
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -114,15 +109,24 @@ export default function Home({ navigation, route }) {
       >
         {instrumentos.map((i) =>
         <View key={i.id}>
-          <Title style={{alignSelf: "center", marginTop: 10}}>{i.nome}</Title>
-          <Text style={styles.limiteText} onPress={() => {setMudarLimite(true); setInstrumentoLimite(i.id); setObjLimite(i.limite);}}>Limite: {i.limite}</Text>
-          <Text style={{alignSelf: "center", color: "red", marginBottom: 10,}}>Faltam {i.qtdPessoas} pessoas</Text>
-          <Card style={{ marginBottom: 20, marginHorizontal: 20}}>
+          <Title style={styles.cardTitulo}>{i.nome}</Title>
+          <Text
+            style={{alignSelf: 'center'}}
+            onPress={() => {
+              setMudarLimite(true);
+              setInstrumentoLimite(i.id);
+              setObjLimite(i.limite);
+            }}
+          >
+            Limite: {i.limite}
+          </Text>
+          <Text style={styles.cardQtdPessoas}>Faltam {i.qtdPessoas} pessoas</Text>
+          <Card style={styles.card}>
             <Card.Cover source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Repique.JPG" }} />
             <Card.Actions style={{alignSelf: "center"}}>
               <Button
                 onPress={() => navigation.navigate("Tabela",
-                  { instrumento_id: i.id, instrumento: i.nome })}
+                  { instrumento_id: i.id, instrumentos: instrumentos })} // setando o instrumento pra n ficar carregando depois para inserir usuario || procurar outro jeito
               >
                 Mais informações
               </Button>
@@ -146,25 +150,30 @@ export default function Home({ navigation, route }) {
                 validationSchema={schema}
                 onSubmit={(values) => onSubmit(values)}
               >
-                {({ handleChange, handleBlur, handleSubmit, errors, values, isValid }) => (
+                {({ handleChange, handleBlur, handleSubmit, errors, values }) => (
                   <View>
-                    <Input
+                    <View>
+                      {errors.limite && (
+                        <Text style={{color: 'red'}}>{errors.limite}</Text>
+                      )}
+                    </View>
+                    <TextInput
                       defaultValue={objLimite}
-                      error={errors.limite}
                       onBlur={handleBlur("limite")}
                       onChangeText={handleChange('limite')}
                       textAlign={"center"}
                       keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
                       maxLength={2}
                       value={values.limite}
-                      style={[styles.boxInput, { borderColor: "black", paddingLeft: 75 }]}
+                      style={styles.limiteInput}
                     />
-                    <Botao
-                      botaoStyle={{marginTop: 10, backgroundColor: (!disable || isValid) ? 'black' : '#CACFD2', borderRadius: 0 }} // verificando se o usuario ja tiver apertado, ficar com a cor de disable
-                      texto={'Enviar'}
+                    <TouchableOpacity
+                      style={[styles.limiteBotao, { backgroundColor: !disable ? 'black' : '#CACFD2' }]}
                       onPress={handleSubmit}
-                      disabled={!isValid || disable}
-                    />
+                      disabled={disable}
+                    >
+                      <Text style={styles.limiteBotaoTexto}>Trocar</Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </Formik>
@@ -176,7 +185,7 @@ export default function Home({ navigation, route }) {
         style={styles.fab}
         icon="plus"
         onPress={() => navigation.navigate("PegarImagem",
-          { instrumento: "", tela: "Home" })}
+          { instrumento: "", tela: "Home", instrumentos: instrumentos, instrumento_id: instrumentos[0].id })}
       />
     </View>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import * as yup from "yup";
 import { Formik } from 'formik';
 import { showMessage } from "react-native-flash-message"
@@ -7,8 +7,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import message, { testarConexao } from "../services/errors";
 import styles from '../css/styles';
-import Botao from '../components/Botao';
 import api from '../services/api';
+import Loading from '../components/Loading';
 
 const schema = yup.object().shape({
   nome: yup.string()
@@ -23,6 +23,8 @@ const schema = yup.object().shape({
 export default function AdminForm({ navigation, route }) {
 
   const [ disable, setDisable ] = useState(false);
+
+  const [ esconderSenha, setEsconderSenha ] = useState(true);
 
 	const onSubmit = async (data) => {
 
@@ -58,18 +60,19 @@ export default function AdminForm({ navigation, route }) {
 		.catch((error) => {
 			console.log(error);
 			message.erroDesconhecido();
-			setDisable(false);
+      setDisable(false);
 		});
 	}
 
   return (
     <ScrollView>
+      <Loading loading={disable}/>
       <Formik
 				initialValues={{ nome: '', email: '', senha: '' }}
 				validationSchema={schema}
 				onSubmit={(values) => onSubmit(values)}
 			>
-				{({ handleChange, handleBlur, handleSubmit, errors, values, isValid }) => (				
+				{({ handleChange, handleBlur, handleSubmit, errors, values }) => (				
 					<View style={{marginTop: 10}}>
             <View style={{flex: 1, alignItems: 'center', marginBottom: 50, maxHeight: 20, minHeight: 20}}>
               { errors.nome && (
@@ -82,79 +85,77 @@ export default function AdminForm({ navigation, route }) {
                 <Text style={styles.errorMessage}>{errors.senha}</Text>
               )}
             </View>
-						<View style={{marginBottom: 20}}>
-							<View style={{marginLeft: 35, marginBottom: 5}}>
-								<Text
-									style={{fontSize: 18}}
-								>
-									Nome
-								</Text>
-							</View>
-							<View>
-								<TextInput
-									onChangeText={handleChange("nome")}
-									onBlur={handleBlur("nome")}
-									value={values.nome}
-									placeholder="Nome"
-									maxLength={40}
-									style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
-								/>
-							</View>
-						</View>
-						<View style={{marginBottom: 20}}>
-							<View style={{marginLeft: 35, marginBottom: 5}}>
-								<Text
-									style={{fontSize: 18}}
-								>
-									Email
-								</Text>
-							</View>
-							<View>
-								<TextInput
-									onChangeText={handleChange("email")}
-                  onBlur={handleBlur("email")}
-                  value={values.email}
-                  placeholder="Email"
-                  maxLength={40}
-                  style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
-                  autoCapitalize="none"
-                  autoCompleteType="email"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-								/>
-							</View>
-						</View>
-						<View style={{marginBottom: 40}}>
-							<View style={{marginLeft: 35, marginBottom: 4}}>
-								<Text
-									style={{fontSize: 18}}
-								>
-									Senha
-								</Text>
-							</View>
-							<View>
-								<TextInput
-									onChangeText={handleChange("senha")}
-									onBlur={handleBlur("senha")}
-									value={values.senha}
-									placeholder="Senha"
-									maxLength={40}
-									style={[styles.boxInput, { borderColor: 'black', borderWidth: 1 }]}
-									secureTextEntry={true}
-								/>
+            <View style={styles.formView}>
+              <Text
+                style={styles.formTexto}
+              >
+                Nome
+              </Text>
+            </View>
+            <View style={styles.formInputView}>
+              <TextInput
+                onChangeText={handleChange("nome")}
+                onBlur={handleBlur("nome")}
+                value={values.nome}
+                placeholder="Nome"
+                maxLength={40}
+                style={styles.formInput}
+              />
+            </View>
+						<View style={styles.formView}>
+              <Text
+                style={styles.formTexto}
+              >
+                Email
+              </Text>
+            </View>
+            <View style={styles.formInputView}>
+              <TextInput
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                value={values.email}
+                placeholder="Email"
+                maxLength={40}
+                style={styles.formInput}
+                autoCapitalize="none"
+                autoCompleteType="email"
+                autoCorrect={false}
+                keyboardType="email-address"
+              />
+            </View>
+						<View style={styles.formView}>
+              <Text
+                style={styles.formTexto}
+              >
+                Senha
+              </Text>
+            </View>
+            <View style={styles.formInputView}>
+              <TextInput
+                onChangeText={handleChange("senha")}
+                onBlur={handleBlur("senha")}
+                value={values.senha}
+                placeholder="Senha"
+                maxLength={40}
+                style={styles.formInput}
+                secureTextEntry={esconderSenha}
+              />
+              <TouchableOpacity onPress={() => setEsconderSenha(!esconderSenha)}>
                 <Icon
-                  name="eye-off"
+                  name={esconderSenha ? "eye-off" : "eye"}
+                  style={styles.iconSenha}
                   size={20}
                 />
-							</View>
-						</View>
+              </TouchableOpacity>
+            </View>
 						<View>
-              <Botao
-			  	      botaoStyle={{ backgroundColor: !disable ? "black" : "#CACFD2" }}
-                texto="Cadastrar"
+              <TouchableOpacity
+                style={[styles.botao, { backgroundColor: !disable ? "black" : "#CACFD2" }]}
                 onPress={handleSubmit}
-                disabled={!isValid || disable}
-              />
+                disabled={disable}
+              >
+                <Text style={styles.botaoTexto}>Cadastrar</Text>
+              </TouchableOpacity>
 						</View>
 					</View>
 				)}

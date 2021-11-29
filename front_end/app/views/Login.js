@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TextInput, TouchableNativeFeedbackBase } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import * as yup from 'yup'
 import { Formik } from 'formik'
 import { showMessage } from "react-native-flash-message"
@@ -8,9 +8,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import message, { testarConexao } from "../services/errors"
 
 import styles from '../css/styles'
-import Botao from '../components/Botao'
 import api from '../services/api'
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import Loading from '../components/Loading';
 
 const schema = yup.object().shape({
   	email: yup.string()
@@ -28,47 +27,48 @@ export default function Login({navigation, route}) {
   const [ esconderSenha, setEsconderSenha ] = useState(true);
 
 	const onSubmit = async (data) => {
-      setDisable(true);
-
-      const connection = await testarConexao();
-      if (!connection) {
-        setDisable(false);
-        return;
-      }
-
-      await api.post("/login/auth", {
-        email: data.email,
-        senha: data.senha
-        // email: "ts@gmail.com",
-        // senha: "123"
-      })
-      .then(() => {
-        showMessage({
-          message: "Bem vindo",
-          type: "success"
-        });
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Home" }],
-        });
-      })
-      .catch((error) => {
-        if (error.response) {
-          showMessage({
-            message: error.response.data.message,
-            type: "danger",
-            duration: 2850,
-            titleStyle: {alignSelf: "center"}
-          });
-        } else {
-          message.erroDesconhecido();
-        }  
-      });
+    
+    setDisable(true);
+    
+    const connection = await testarConexao();
+    if (!connection) {
       setDisable(false);
+      return;
+    }
+    await api.post("/login/auth", {
+      email: data.email,
+      senha: data.senha
+      // email: "ts@gmail.com",
+      // senha: "123"
+    })
+    .then(() => {
+      showMessage({
+        message: "Bem vindo",
+        type: "success"
+      });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
+    })
+    .catch((error) => {
+      if (error.response) {
+        showMessage({
+          message: error.response.data.message,
+          type: "danger",
+          duration: 2850,
+          titleStyle: {alignSelf: "center"}
+        });
+      } else {
+        message.erroDesconhecido();
+      }
+    });
+    setDisable(false);
 	}
 
   return (
      <View>
+      <Loading loading={disable}/>
       <Formik
         initialValues={{ email: '', senha: '' }}
         validationSchema={schema}
@@ -131,17 +131,17 @@ export default function Login({navigation, route}) {
               </TouchableOpacity>
             </View>
             <View style={{ marginTop: 20 }}>
-              <Botao
-                botaoStyle={{backgroundColor: !disable ? 'black' : '#CACFD2'}}
-                textoStyle={{fontSize: 17}}
-                texto={"Entrar"}
-                onPress={handleSubmit}
-                disabled={!isValid || disable}
-              />
-            </View>
-         </View>
-       )}
-     </Formik>
+            <TouchableOpacity
+              style={[styles.botao, {backgroundColor: !disable ? 'black' : '#CACFD2'}]}
+              onPress={handleSubmit}
+              disabled={disable}
+            >
+              <Text style={styles.botaoTexto}>Entrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </Formik>
    </View>
   );
 }

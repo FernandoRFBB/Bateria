@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { showMessage } from "react-native-flash-message"
 
 import api from '../services/api';
 import message, { testarConexao } from "../services/errors";
 import styles from '../css/styles'
-import Botao from '../components/Botao';
 
 export default function Config({ navigation, route }) {
 
@@ -31,22 +30,20 @@ export default function Config({ navigation, route }) {
         index: 0,
         routes: [{ name: "Login" }],
       });
+    })
+    .catch(() => {
+      message.erroDesconhecido();
     });
 	}
 
 	return (
     	<View style={styles.containerConfig}>
-        <Botao
-          botaoStyle={{ marginTop: 10, marginHorizontal: "25%" }}
-          texto="Criar administrador"
-          onPress={() => navigation.navigate("AdminForm", { tela: "Config" })}
-        />
-        <Botao
-          botaoStyle={{ marginTop: 10, marginHorizontal: "25%" }}
-          texto="Sair"
-          onPress={logout}
-          disabled={disable}
-        />
+        <TouchableOpacity style={styles.configBotao} onPress={() => navigation.navigate("AdminForm", { tela: "Config" })}>
+          <Text style={styles.botaoTexto}>Criar administrador</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.configBotao} onPress={logout} disabled={disable}>
+          <Text style={styles.botaoTexto}>Sair</Text>
+        </TouchableOpacity>
       </View>
     )
 }

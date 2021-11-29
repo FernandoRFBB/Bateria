@@ -92,6 +92,7 @@ export default StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginRight: 10,
+        marginLeft: -50
       },
       textoColuna: {
         alignSelf: "center"
@@ -185,7 +186,8 @@ export default StyleSheet.create({
         borderRadius: 10,
       },
       botaoTexto: {
-        color: 'white'
+        color: 'white',
+        fontSize: 16
       },
       previaFoto: {
         width: 200,
@@ -300,5 +302,62 @@ export default StyleSheet.create({
         alignSelf: 'center',
         marginHorizontal: 20,
         marginTop: 20
+      },
+      limiteInput: {
+        borderColor: 'black',
+        borderWidth: 0.5,
+        paddingHorizontal: 70,
+        fontSize: 20,
+        paddingVertical: 10,
+        marginTop: 10,
+        marginBottom: 20
+      },
+      limiteBotao: {
+        backgroundColor: 'black',
+        paddingVertical: 10,
+        borderRadius: 20
+      },
+      limiteBotaoTexto: {
+        alignSelf: 'center',
+        color: 'white',
+        fontSize: 16
+      },
+      cardTitulo: {
+        alignSelf: "center",
+        marginTop: 10
+      },
+      cardQtdPessoas: {
+        alignSelf: "center",
+        marginBottom: 10,
+        color: "red"
+      },
+      card: {
+        marginHorizontal: 20,
+        marginBottom: 20
+      },
+      deletarBotao: {
+        backgroundColor: 'black',
+        width: 80,
+        height: 40,
+        alignItems: 'center',
+        marginHorizontal: 40,
+        paddingTop: 10,
+        borderRadius: 5
+      },
+      deletarView: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        marginTop: 30,
+        paddingBottom: 40
+      },
+      configBotao: {
+        alignItems: "center",
+        backgroundColor: "black",
+        borderRadius: 10,
+        paddingVertical: 15,
+        marginBottom: 20,
+        marginTop: 10,
+        marginHorizontal: "25%"
       }
 })

@@ -27,8 +27,8 @@
       "package": "com.bitt.bateria"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
-    "description": ""
+    "description": "App para controle de bateria em escolas de samba"
   }
 }
